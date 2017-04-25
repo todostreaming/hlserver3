@@ -23,16 +23,17 @@ var (
 
 func init() {
 	var err error
-	dbplayers, err = sql.Open("sqlite3", "players.db")
+	dbplayers, err = sql.Open("sqlite3", "./players.db") // on RAMdisk
 	if err != nil {
-		log.Fatalln("Fallo al abrir el archivo de error:", err)
+		log.Fatalln("Fallo al abrir el archivo DB:", err)
 	}
+	dbplayers.Exec("PRAGMA journal_mode=WAL;")
 }
 
 func main() {
 	// Handlers del Servidor HTTP
 	s := &http.Server{
-		Addr:           ":80",            // config http port
+		Addr:           ":9999",          // config http port
 		Handler:        nil,              // Default Muxer for handler as usual
 		ReadTimeout:    20 * time.Second, // send a segment in POST body
 		WriteTimeout:   20 * time.Second, // receive a segment in GET req
@@ -184,10 +185,16 @@ func filldb(w http.ResponseWriter, r *http.Request) {
 	mu_ident.Unlock()
 
 	mu_dbplayers.Lock()
-	_, err := dbplayers.Exec("INSERT INTO players (`id`, `rawstream`, `ipproxy`, `ipclient`, `timestamp`, `time`, `kilobytes`, `total_time`, `agent`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE  ",
-		id)
+	_, err := dbplayers.Exec("INSERT INTO players (`id`, `rawstream`, `ipproxy`, `ipclient`, `timestamp`, `time`, `kilobytes`, `total_time`, `agent`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		id, "livestream", "46.0.34.7", "192.168.4.90", 14909928, 0, 0, 0, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36")
 	mu_dbplayers.Unlock()
 	if err != nil {
-		fmt.Println("DB error:", err)
+		if strings.Contains(err.Error(), "constraint") { // UNIQUE constraint failed: players.id
+			mu_dbplayers.Lock()
+			dbplayers.Exec("UPDATE players SET time = time +10, total_time = total_time + 10 WHERE id = ?", id)
+			mu_dbplayers.Unlock()
+		} else {
+			fmt.Println("DB error:", err)
+		}
 	}
 }
