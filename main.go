@@ -160,7 +160,8 @@ func createstats(r *http.Request, rawstream string, id int64) { // function to r
 	}
 	tr := strings.Split(r.RemoteAddr, ":")
 	spl := strings.Split(remoteip, ":")
-	fmt.Printf("id=%d, rawstream=%s, ipproxy=%s, ipclient=%s, agent=%s, referer=%s\n\n", id, rawstream, tr[0], spl[0], r.UserAgent(), r.Referer())
+	fmt.Printf("id=%d, rawstream=%s, ipproxy=%s, ipclient=%s, agent=%s, referer=%s\r", id, rawstream, tr[0], spl[0], r.UserAgent(), r.Referer())
+	// maxmind geoip2 from (github.com/oschwald/geoip2-golang) loaded on RAM, only once openned and exclusive mutex locked at every read
 
 	return
 }
