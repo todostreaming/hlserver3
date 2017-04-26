@@ -4,10 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/oschwald/geoip2-golang"
 	"io"
 	"log"
+	"math/rand"
+	"net"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -19,15 +23,24 @@ var (
 
 	dbplayers    *sql.DB    // db only with live players raw info
 	mu_dbplayers sync.Mutex // also exclusive mutex for
+
+	dbgeoip    *geoip2.Reader
+	mu_dbgeoip sync.Mutex
 )
 
 func init() {
 	var err error
-	dbplayers, err = sql.Open("sqlite3", "./players.db") // on RAMdisk
+	dbplayers, err = sql.Open("sqlite3", "/var/segments/players.db") // on RAMdisk
 	if err != nil {
 		log.Fatalln("Fallo al abrir el archivo DB:", err)
 	}
 	dbplayers.Exec("PRAGMA journal_mode=WAL;")
+
+	dbgeoip, err = geoip2.Open("/var/segments/GeoIP2-City.mmdb")
+	if err != nil {
+		log.Fatal("Fallo al abrir el GeoIP2:", err)
+	}
+
 }
 
 func main() {
@@ -39,9 +52,16 @@ func main() {
 		WriteTimeout:   20 * time.Second, // receive a segment in GET req
 		MaxHeaderBytes: 1 << 13,          // 8K as Apache and others
 	}
+	go func() {
+		for {
+			fmt.Printf("%d                             \r", runtime.NumGoroutine())
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
 
 	http.HandleFunc("/", root)
 	http.HandleFunc("/filldb.cgi", filldb)
+	http.HandleFunc("/geoip.cgi", geoip)
 
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }
@@ -93,7 +113,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 					defer fr.Close()
-					go createstats(r, spl[0], id)
+					createstats(r, spl[0], id) //evaluate not to use goroutines here that could overload the system and panic
 					w.Header().Set("Cache-Control", "no-cache")
 					w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 					w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -198,4 +218,35 @@ func filldb(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("DB error:", err)
 		}
 	}
+}
+
+func geoip(w http.ResponseWriter, r *http.Request) {
+	var city, region, country, isocode, timezone string
+	var lat, long float64
+
+	ipstring := fmt.Sprintf("%d.%d.%d.%d", random(1, 255), random(1, 256), random(1, 256), random(1, 256))
+	ip := net.ParseIP(ipstring)
+	mu_dbgeoip.Lock()
+	record, err := dbgeoip.City(ip)
+	mu_dbgeoip.Unlock()
+	if err != nil {
+		log.Fatal(err)
+	}
+	city = record.City.Names["en"]
+	if len(record.Subdivisions) > 0 {
+		region = record.Subdivisions[0].Names["en"]
+	}
+	country = record.Country.Names["en"]
+	isocode = record.Country.IsoCode
+	timezone = record.Location.TimeZone
+	lat = record.Location.Latitude
+	long = record.Location.Longitude
+
+	fmt.Fprintf(w, "%s-%s-%s-%s-%s : %f/%f\n", city, region, country, isocode, timezone, lat, long) // avoid console printing of plenty logs
+
+}
+
+func random(min, max int) int { // [min,max)
+	rand.Seed(time.Now().UTC().UnixNano())
+	return rand.Intn(max-min) + min
 }
