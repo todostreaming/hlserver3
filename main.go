@@ -221,8 +221,7 @@ func filldb(w http.ResponseWriter, r *http.Request) {
 }
 
 func geoip(w http.ResponseWriter, r *http.Request) {
-	var city, region, country, isocode, timezone string
-	var lat, long float64
+	var city, country, isocode string
 
 	ipstring := fmt.Sprintf("%d.%d.%d.%d", random(1, 255), random(1, 256), random(1, 256), random(1, 256))
 	ip := net.ParseIP(ipstring)
@@ -230,19 +229,13 @@ func geoip(w http.ResponseWriter, r *http.Request) {
 	record, err := dbgeoip.City(ip)
 	mu_dbgeoip.Unlock()
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	city = record.City.Names["en"]
-	if len(record.Subdivisions) > 0 {
-		region = record.Subdivisions[0].Names["en"]
-	}
 	country = record.Country.Names["en"]
 	isocode = record.Country.IsoCode
-	timezone = record.Location.TimeZone
-	lat = record.Location.Latitude
-	long = record.Location.Longitude
 
-	fmt.Fprintf(w, "%s-%s-%s-%s-%s : %f/%f\n", city, region, country, isocode, timezone, lat, long) // avoid console printing of plenty logs
+	fmt.Fprintf(w, "%s-[%s]-(%s)\n", country, isocode, city) // avoid console printing of plenty logs
 
 }
 
