@@ -29,7 +29,6 @@ var (
 	mu_dbgeoip sync.Mutex
 )
 
-/*
 func init() {
 	var err error
 	dbplayers, err = sql.Open("sqlite3", "/var/db/players.db") // on RAMdisk
@@ -44,7 +43,6 @@ func init() {
 	}
 
 }
-*/
 
 func main() {
 	// Handlers del Servidor HTTP
