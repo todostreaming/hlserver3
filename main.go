@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"math/rand"
+	"mime"
 	"net"
 	"net/http"
 	"os"
@@ -28,25 +29,27 @@ var (
 	mu_dbgeoip sync.Mutex
 )
 
+/*
 func init() {
 	var err error
-	dbplayers, err = sql.Open("sqlite3", "/var/segments/players.db") // on RAMdisk
+	dbplayers, err = sql.Open("sqlite3", "/var/db/players.db") // on RAMdisk
 	if err != nil {
 		log.Fatalln("Fallo al abrir el archivo DB:", err)
 	}
 	dbplayers.Exec("PRAGMA journal_mode=WAL;")
 
-	dbgeoip, err = geoip2.Open("/var/segments/GeoIP2-City.mmdb")
+	dbgeoip, err = geoip2.Open("/var/db/GeoIP2-City.mmdb")
 	if err != nil {
 		log.Fatal("Fallo al abrir el GeoIP2:", err)
 	}
 
 }
+*/
 
 func main() {
 	// Handlers del Servidor HTTP
 	s := &http.Server{
-		Addr:           ":9999",          // config http port
+		Addr:           ":80",            // config http port
 		Handler:        nil,              // Default Muxer for handler as usual
 		ReadTimeout:    20 * time.Second, // send a segment in POST body
 		WriteTimeout:   20 * time.Second, // receive a segment in GET req
@@ -62,6 +65,8 @@ func main() {
 	http.HandleFunc("/", root)
 	http.HandleFunc("/filldb.cgi", filldb)
 	http.HandleFunc("/geoip.cgi", geoip)
+	http.HandleFunc("/cookies.cgi", cookies)
+	http.HandleFunc("/delcookies.cgi", delcookies)
 
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }
@@ -113,7 +118,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 					defer fr.Close()
-					createstats(r, spl[0], id) //evaluate not to use goroutines here that could overload the system and panic
+					//createstats(r, spl[0], id) //evaluate not to use goroutines here that could overload the system and panic
 					w.Header().Set("Cache-Control", "no-cache")
 					w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 					w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -235,11 +240,38 @@ func geoip(w http.ResponseWriter, r *http.Request) {
 	country = record.Country.Names["en"]
 	isocode = record.Country.IsoCode
 
-	fmt.Fprintf(w, "%s-[%s]-(%s)\n", country, isocode, city) // avoid console printing of plenty logs
+	fmt.Fprintf(w, "%s [%s] (%s)\n", country, isocode, city) // avoid console printing of plenty logs
 
 }
 
 func random(min, max int) int { // [min,max)
 	rand.Seed(time.Now().UTC().UnixNano())
 	return rand.Intn(max-min) + min
+}
+
+func cookies(w http.ResponseWriter, r *http.Request) {
+	expiration := time.Now().Add(24 * time.Hour)
+	cookie := http.Cookie{Name: "username", Value: "antonio", Expires: expiration}
+	http.SetCookie(w, &cookie)
+
+	w.Header().Set("Content-Type", mime.TypeByExtension(".html"))
+	fmt.Fprintf(w, "<h2>Cookies list:</h2><br>")
+	for _, cookie := range r.Cookies() {
+		fmt.Fprintf(w, "<p>%s : %s</p>", cookie.Name, cookie.Value)
+	}
+	fmt.Fprintf(w, "<a href=\"/delcookies.cgi\">Delete Cookies</a>")
+}
+
+func delcookies(w http.ResponseWriter, r *http.Request) {
+	for _, cookie := range r.Cookies() {
+		cookie.MaxAge = -1
+		http.SetCookie(w, cookie)
+	}
+
+	w.Header().Set("Content-Type", mime.TypeByExtension(".html"))
+	fmt.Fprintf(w, "<h2>Cookies list:</h2><br>")
+	for _, cookie := range r.Cookies() {
+		fmt.Fprintf(w, "<p>%s : %s (deleted)</p>", cookie.Name, cookie.Value)
+	}
+
 }
