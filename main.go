@@ -118,6 +118,9 @@ func root(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 					defer fr.Close()
+					go func() {
+						time.Sleep(1 * time.Millisecond) // this can be a MySQL writer INSERT ON DUPLICATE UPDATE
+					}()
 					//createstats(r, spl[0], id) //evaluate not to use goroutines here that could overload the system and panic
 					w.Header().Set("Cache-Control", "no-cache")
 					w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
