@@ -1,3 +1,4 @@
+// ab -r -n 100000 -c 200 -l "http://127.0.0.1:9999/geoip.cgi"
 package main
 
 import (
@@ -39,7 +40,7 @@ func init() {
 
 	dbgeoip, err = geoip2.Open("/var/db/GeoIP2-City.mmdb")
 	if err != nil {
-		log.Fatal("Fallo al abrir el GeoIP2:", err)
+		log.Fatalln("Fallo al abrir el GeoIP2:", err)
 	}
 
 }
@@ -47,16 +48,22 @@ func init() {
 func main() {
 	// Handlers del Servidor HTTP
 	s := &http.Server{
-		Addr:           ":80",            // config http port
+		Addr:           ":9999",          // config http port
 		Handler:        nil,              // Default Muxer for handler as usual
 		ReadTimeout:    20 * time.Second, // send a segment in POST body
 		WriteTimeout:   20 * time.Second, // receive a segment in GET req
 		MaxHeaderBytes: 1 << 13,          // 8K as Apache and others
 	}
 	go func() {
+		var old, num, max int
 		for {
-			fmt.Printf("%d                             \r", runtime.NumGoroutine())
+			num = runtime.NumGoroutine()
+			if num > old {
+				max = num
+			}
+			fmt.Printf("%d / %d                            \r", runtime.NumGoroutine(), max)
 			time.Sleep(100 * time.Millisecond)
+			old = num
 		}
 	}()
 
@@ -117,7 +124,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 					}
 					defer fr.Close()
 					go func() {
-						time.Sleep(1 * time.Millisecond) // this can be a MySQL writer INSERT ON DUPLICATE UPDATE
+						time.Sleep(1 * time.Millisecond) // this can be a MySQL writer INSERT ON DUPLICATE UPDATE (create very few variables inside to avoid filling the RAM)
 					}()
 					//createstats(r, spl[0], id) //evaluate not to use goroutines here that could overload the system and panic
 					w.Header().Set("Cache-Control", "no-cache")
@@ -211,19 +218,22 @@ func filldb(w http.ResponseWriter, r *http.Request) {
 	id := ident
 	mu_ident.Unlock()
 
-	mu_dbplayers.Lock()
-	_, err := dbplayers.Exec("INSERT INTO players (`id`, `rawstream`, `ipproxy`, `ipclient`, `timestamp`, `time`, `kilobytes`, `total_time`, `agent`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		id, "livestream", "46.0.34.7", "192.168.4.90", 14909928, 0, 0, 0, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36")
-	mu_dbplayers.Unlock()
-	if err != nil {
-		if strings.Contains(err.Error(), "constraint") { // UNIQUE constraint failed: players.id
-			mu_dbplayers.Lock()
-			dbplayers.Exec("UPDATE players SET time = time +10, total_time = total_time + 10 WHERE id = ?", id)
-			mu_dbplayers.Unlock()
-		} else {
-			fmt.Println("DB error:", err)
+	go func() {
+		mu_dbplayers.Lock()
+		_, err := dbplayers.Exec("INSERT INTO players (`id`, `rawstream`, `ipproxy`, `ipclient`, `timestamp`, `time`, `kilobytes`, `total_time`, `agent`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			id, "livestream", "46.0.34.7", "192.168.4.90", 14909928, 0, 0, 0, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36")
+		mu_dbplayers.Unlock()
+		if err != nil {
+			if strings.Contains(err.Error(), "constraint") { // UNIQUE constraint failed: players.id
+				mu_dbplayers.Lock()
+				dbplayers.Exec("UPDATE players SET time = time +10, total_time = total_time + 10 WHERE id = ?", id)
+				mu_dbplayers.Unlock()
+			} else {
+				fmt.Println("DB error:", err)
+			}
 		}
-	}
+	}()
+	fmt.Fprintf(w, "record id: %d", id)
 }
 
 func geoip(w http.ResponseWriter, r *http.Request) {
