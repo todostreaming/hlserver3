@@ -48,7 +48,7 @@ func init() {
 func main() {
 	// Handlers del Servidor HTTP
 	s := &http.Server{
-		Addr:           ":9999",          // config http port
+		Addr:           ":80",            // config http port
 		Handler:        nil,              // Default Muxer for handler as usual
 		ReadTimeout:    20 * time.Second, // send a segment in POST body
 		WriteTimeout:   20 * time.Second, // receive a segment in GET req
@@ -161,6 +161,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Internal Server Error", 500)
 				return
 			}
+			fmt.Printf("Request from %s File: %s\n", r.RemoteAddr, file)
+			t := time.Now()
 			defer fr.Close()
 			w.Header().Set("Cache-Control", "max-age=300")
 			w.Header().Set("Content-Type", "video/MP2T")
@@ -172,6 +174,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Length", fmt.Sprintf("%d", fileinfo.Size()))
 			w.Header().Set("Accept-Ranges", "bytes")
 			io.Copy(w, fr)
+			fmt.Printf("Served in %d millisec\n", time.Since(t).Nanoseconds()/1000000)
 			return
 		}
 	} else { // regular web content
