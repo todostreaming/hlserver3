@@ -76,8 +76,7 @@ func main() {
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }
 
-// sirve todos los ficheros estáticos de la web html,css,js,graficos,etc
-// benchmarks: ab -r -k -n 30000 -c 5000 [uri]
+// benchmarks: ab -r -k -l -n 30000 -c 5000 [uri]
 func root(w http.ResponseWriter, r *http.Request) {
 	// request uri = "http://localhost/live/luztv-livestream.w8889.m3u8?id=0x449484abb&wid=0xbc677870"
 	// r.URL.Path[1:] = "live/luztv-livestream.w8889.m3u8" <=> r.URL.RawQuery = "id=0x449484abb&wid=0xbc677870"
@@ -86,6 +85,10 @@ func root(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(path, ".m3u8") { // .m3u8 playlists
 		if strings.Contains(path, "-playlist.m3u8") { // 1st identifying playlist
 			// live/luztv-livestream-playlist.m3u8
+			// recover the player cookie "rawstream" => ident
+
+			// if no cookie found, lets create a new one with a new ident number for this player and stream
+
 			var id int64
 			mu_ident.Lock()
 			ident++
@@ -161,8 +164,6 @@ func root(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Internal Server Error", 500)
 				return
 			}
-			fmt.Printf("Request from %s File: %s\n", r.RemoteAddr, file)
-			t := time.Now()
 			defer fr.Close()
 			w.Header().Set("Cache-Control", "max-age=300")
 			w.Header().Set("Content-Type", "video/MP2T")
@@ -174,7 +175,6 @@ func root(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Length", fmt.Sprintf("%d", fileinfo.Size()))
 			w.Header().Set("Accept-Ranges", "bytes")
 			io.Copy(w, fr)
-			fmt.Printf("Served in %d millisec\n", time.Since(t).Nanoseconds()/1000000)
 			return
 		}
 	} else { // regular web content
