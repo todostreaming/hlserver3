@@ -29,7 +29,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 			mu_ident.Unlock()
 			path = strings.Replace(path, "-playlist.m3u8", "", -1)
 			tr := strings.Split(path, "/")
-			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3177936,CODECS=\"avc1.100.41, mp4a.40.2\",RESOLUTION=1920x1080\n%s.wid%d.m3u8", tr[len(tr)-1], id)
+			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3177936\n%s.wid%d.m3u8", tr[len(tr)-1], id)
 			w.Header().Set("Cache-Control", "no-cache")
 			w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 			w.Header().Set("Access-Control-Allow-Headers", "*")

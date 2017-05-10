@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"mime"
 	"net"
 	"net/http"
@@ -30,15 +29,15 @@ func filldb(w http.ResponseWriter, r *http.Request) {
 	mu_ident.Unlock()
 
 	go func() {
-		mu_dbplayers.Lock()
-		_, err := dbplayers.Exec("INSERT INTO players (`id`, `rawstream`, `ipproxy`, `ipclient`, `timestamp`, `time`, `kilobytes`, `total_time`, `agent`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		mu_dblive.Lock()
+		_, err := dblive.Exec("INSERT INTO players (`id`, `rawstream`, `ipproxy`, `ipclient`, `timestamp`, `time`, `kilobytes`, `total_time`, `agent`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 			id, "livestream", "46.0.34.7", "192.168.4.90", 14909928, 0, 0, 0, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36")
-		mu_dbplayers.Unlock()
+		mu_dblive.Unlock()
 		if err != nil {
 			if strings.Contains(err.Error(), "constraint") { // UNIQUE constraint failed: players.id
-				mu_dbplayers.Lock()
-				dbplayers.Exec("UPDATE players SET time = time +10, total_time = total_time + 10 WHERE id = ?", id)
-				mu_dbplayers.Unlock()
+				mu_dblive.Lock()
+				dblive.Exec("UPDATE players SET time = time +10, total_time = total_time + 10 WHERE id = ?", id)
+				mu_dblive.Unlock()
 			} else {
 				fmt.Println("DB error:", err)
 			}
@@ -64,11 +63,6 @@ func geoip(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "%s [%s] (%s)\n", country, isocode, city) // avoid console printing of plenty logs
 
-}
-
-func random(min, max int) int { // [min,max)
-	rand.Seed(time.Now().UTC().UnixNano())
-	return rand.Intn(max-min) + min
 }
 
 func cookies(w http.ResponseWriter, r *http.Request) {

@@ -44,7 +44,7 @@ CREATE TABLE "players" (
 -- username		= 1st part in stream
 -- streamname	= 2nd part in stream
 -- time			= seconds connected since the latest disconnection
--- bitrate		= kbps of publishing
+-- bitrate		= bps of publishing
 -- ip			= ip of publisher
 -- info			= codec and general video info
 -- isocode		= ISO 3166-2 country code
