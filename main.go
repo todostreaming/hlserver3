@@ -41,6 +41,10 @@ func init() {
 	}
 	// empty the bitrates map
 	Bw_int = new(syncmap.Map)
+	// empty the referer map
+	Referer = new(syncmap.Map)
+	// empty the forecaster map
+	Forecaster = new(syncmap.Map)
 }
 
 func main() {

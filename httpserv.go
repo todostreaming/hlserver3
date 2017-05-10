@@ -65,12 +65,19 @@ func root(w http.ResponseWriter, r *http.Request) {
 			return
 		} else if strings.Contains(path, ".wid") { // recursive identified playlist
 			// live/luztv-livestream.wid45006.m3u8
-			// we have to watch the referer, if allowed for this rawstream
-
 			var id int64
 			tr := strings.Split(path, "/")
 			spl := strings.Split(tr[len(tr)-1], ".")
 			if len(spl) == 3 { // we response the content of the original .m3u8 playlist and record on database the stats info
+				// we have to watch the referer, if allowed for this rawstream  ["rawstream"] = "domain1.com;domain2.com"
+				val, ok := Referer.Load(spl[0])
+				if ok {
+					// get the referrer from request and compare to the one in the map (url: http://www.w3.org/hypertext/DataSources/Overview.html)
+					if !strings.Contains(val.(string), getdomain(r.Referer())) {
+						http.NotFound(w, r)
+						return
+					}
+				}
 				fmt.Sscanf(spl[1], "wid%d", &id)
 				file := spl[0] + ".m3u8"
 				fileinfo, err := os.Stat(file)
@@ -78,6 +85,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 					http.NotFound(w, r)
 					return
 				} else {
+					// open the old/file.m3u8 (forecast pre-caching mechanism for CDNs)
+
 					fr, errn := os.Open(file)
 					if errn != nil {
 						http.Error(w, "Internal Server Error", 500)

@@ -46,3 +46,15 @@ func geoIP(ip_parsing string) (country, isocode, city string) {
 
 	return country, isocode, city
 }
+
+// from a complete url
+func getdomain(url string) string {
+	var domain string
+
+	p := strings.Split(url, "/")
+	if len(p) > 2 {
+		domain = p[2]
+	}
+
+	return domain
+}

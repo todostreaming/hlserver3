@@ -21,7 +21,11 @@ var (
 	Info    *log.Logger
 	Warning *log.Logger
 	Error   *log.Logger
-	// mapa de bandwidths de los streams (encoders) en bps
+	// bandwidths map of the rawstreams (encoders) in bps
 	// dont forget to empty it at the end of the day after dayly resume
 	Bw_int *syncmap.Map
+	// referer map ( ["rawstream"] = "domain1.com;domain2.com" )
+	Referer *syncmap.Map
+	// forecasters map ( ["near_proxy=rawstream"] = UNIXtimestamp_int64 )
+	Forecaster *syncmap.Map
 )
