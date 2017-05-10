@@ -13,23 +13,46 @@ import (
 func root(w http.ResponseWriter, r *http.Request) {
 	// request uri = "http://localhost/live/luztv-livestream.w8889.m3u8?id=0x449484abb&wid=0xbc677870"
 	// r.URL.Path[1:] = "live/luztv-livestream.w8889.m3u8" <=> r.URL.RawQuery = "id=0x449484abb&wid=0xbc677870"
-	path := r.URL.Path[1:]
+	path := r.URL.Path[1:] // live/luztv-livestream.m3u8
 	resp := ""
 	if strings.Contains(path, ".m3u8") { // .m3u8 playlists
 		if strings.Contains(path, "-playlist.m3u8") { // 1st identifying playlist
-			// live/luztv-livestream-playlist.m3u8
+			// path = live/luztv-livestream-playlist.m3u8
 			// recover the player cookie "rawstream" => ident
-
-			// if no cookie found, lets create a new one with a new ident number for this player and stream
-
 			var id int64
-			mu_ident.Lock()
-			ident++
-			id = ident
-			mu_ident.Unlock()
-			path = strings.Replace(path, "-playlist.m3u8", "", -1)
-			tr := strings.Split(path, "/")
-			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3177936\n%s.wid%d.m3u8", tr[len(tr)-1], id)
+			var bps int
+			var rawstream, key string
+			a := strings.Split(path, "/")
+			if len(a) == 2 {
+				rawstream = strings.Replace(a[1], "-playlist.m3u8", "", -1) // luztv-livestream
+			} else {
+				http.NotFound(w, r)
+				return
+			}
+			// get the bandwidth
+			val, ok := Bw_int.Load(rawstream)
+			if ok {
+				bps = val.(int)
+			} else {
+				bps = 1000000 // 1 Mbps by default to avoid empty playlist.m3u8
+			}
+			// get the player cookie
+			cookie, err := r.Cookie(rawstream)
+			if err != nil {
+				// not player cookie, let's create one
+				mu_ident.Lock()
+				ident++
+				id = ident
+				mu_ident.Unlock()
+				key = fmt.Sprintf("%s", id)
+			} else {
+				// we have the cookie so we have the ident of this player
+				key = cookie.Value // this is the id in string form
+			}
+			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%d\n%s.wid%d.m3u8", bps, rawstream, key)
+			expiration := time.Now().Add(24 * time.Hour)
+			newcookie := http.Cookie{Name: rawstream, Value: key, Expires: expiration}
+			http.SetCookie(w, &newcookie)
 			w.Header().Set("Cache-Control", "no-cache")
 			w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 			w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -42,6 +65,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 			return
 		} else if strings.Contains(path, ".wid") { // recursive identified playlist
 			// live/luztv-livestream.wid45006.m3u8
+			// we have to watch the referer, if allowed for this rawstream
+
 			var id int64
 			tr := strings.Split(path, "/")
 			spl := strings.Split(tr[len(tr)-1], ".")

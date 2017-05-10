@@ -137,7 +137,7 @@ func encoder() {
 					tiempo := toInt(val2.Time) / 1000 // convert msec to sec
 					tiempo_now := time.Now().Unix()
 					bitrate := toInt(val.Bw_in)                                                       // bps
-					Bw_int.Store(val.Nombre, bitrate)                                                 // Save the bitrate
+					Bw_int.Store(val.Nombre, bitrate)                                                 // ["luztv-livestream"] = 3780000
 					info := fmt.Sprintf("%sx%s %s/%s", val.Width, val.Height, val.Vcodec, val.Acodec) // 1280x720 H264/AAC
 					err := dblive.QueryRow("SELECT count(*) FROM encoders WHERE username = ? AND streamname = ? AND ip= ?", username, streamname, val2.Ip).Scan(&count)
 					if err != nil {
