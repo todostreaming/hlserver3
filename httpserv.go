@@ -78,25 +78,21 @@ func root(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 				}
-				fmt.Sscanf(spl[1], "wid%d", &id)
-				file := spl[0] + ".m3u8"
-				fileinfo, err := os.Stat(file)
+				fmt.Sscanf(spl[1], "wid%d", &id) // wid9876
+				file := spl[0] + ".m3u8"         // rawstream = spl[0]
+				fileinfo, err := os.Stat(rootdir + "live/old/" + file)
 				if err != nil {
 					http.NotFound(w, r)
 					return
 				} else {
 					// open the old/file.m3u8 (forecast pre-caching mechanism for CDNs)
-
-					fr, errn := os.Open(file)
+					fr, errn := os.Open(rootdir + "live/old/" + file)
 					if errn != nil {
 						http.Error(w, "Internal Server Error", 500)
 						return
 					}
 					defer fr.Close()
-					go func() {
-						time.Sleep(1 * time.Millisecond) // this can be a MySQL writer INSERT ON DUPLICATE UPDATE (create very few variables inside to avoid filling the RAM)
-					}()
-					//createstats(r, spl[0], id) //evaluate not to use goroutines here that could overload the system and panic
+					go createstats(r, spl[0], id)
 					w.Header().Set("Cache-Control", "no-cache")
 					w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 					w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -119,14 +115,12 @@ func root(w http.ResponseWriter, r *http.Request) {
 		}
 	} else if strings.Contains(path, ".ts") { // .TS segments
 		// live/segment-56.ts
-		spl := strings.Split(path, "/")
-		file := spl[len(spl)-1]
-		fileinfo, err := os.Stat(file)
+		fileinfo, err := os.Stat(rootdir + path)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		} else {
-			fr, errn := os.Open(file)
+			fr, errn := os.Open(rootdir + path)
 			if errn != nil {
 				http.Error(w, "Internal Server Error", 500)
 				return
@@ -149,7 +143,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createstats(r *http.Request, rawstream string, id int64) { // function to record on DB insert on duplicate update "INSERT INTO table (a,b,c) VALUES (1,2,3) ON DUPLICATE KEY UPDATE c=c+1;"
+func createstats(r *http.Request, rawstream string, id int64) {
 	/*
 		Remote-Ip => [79.109.178.183]
 		X-Remote-Ip => [79.109.178.183]
