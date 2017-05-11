@@ -69,6 +69,7 @@ func main() {
 		}
 	}()
 	go encoder()
+	go diskforecastmechanism()
 
 	http.HandleFunc("/", root)
 	// testing functions

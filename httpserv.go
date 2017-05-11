@@ -143,6 +143,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// just record in live.db @ table players (insert or update)
 func createstats(r *http.Request, rawstream string, id int64) {
 	/*
 		Remote-Ip => [79.109.178.183]
