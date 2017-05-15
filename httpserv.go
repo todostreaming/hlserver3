@@ -138,6 +138,37 @@ func root(w http.ResponseWriter, r *http.Request) {
 			io.Copy(w, fr)
 			return
 		}
+	} else if strings.Contains(path, ".lst") { // latest segment to pre-cache (forecaster map)
+		// http://hlserver3/live/luztv-livestream.lst
+		// tail -1 /var/segments/new/luztv-livestream.m3u8
+		preload := false
+		tr := strings.Split(path, "/")
+		spl := strings.Split(tr[len(tr)-1], ".") // spl[0] = rawstream
+		ip := getip(r.RemoteAddr)                // take near_proxy ip or r.Header["X-Cdn-Pop"] = [gsw] ???
+		key := ip + "=" + spl[0]
+		val, ok := Forecaster.Load(key)
+		if ok {
+			t := time.Now().Unix()
+			if t-val.(int64) >= 5 { // if more than 5 secs
+				preload = true
+				Forecaster.Store(key, time.Now().Unix())
+			}
+		} else {
+			preload = true
+			Forecaster.Store(key, time.Now().Unix())
+		}
+		if preload {
+			resp = getlatestseg(spl[0])
+		}
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Expose-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Accept-Ranges", "bytes")
+		fmt.Fprintf(w, "%s\n", resp) // here the response is the .ts or just a blank string
 	} else { // regular web content
 
 	}

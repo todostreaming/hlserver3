@@ -83,3 +83,14 @@ func getmediaseqnum(m3u8 string) int {
 
 	return seq
 }
+
+func getlatestseg(rawstream string) string { // tail -1 /var/segments/new/luztv-livestream.m3u8
+	var seg string
+
+	out, err := exec.Command("/bin/sh", "-c", "tail -1 "+rootdir+"new/"+rawstream+".m3u8").CombinedOutput()
+	if err == nil {
+		seg = strings.TrimRight(string(out), "\n")
+	}
+
+	return seg
+}
