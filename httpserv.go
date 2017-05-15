@@ -44,12 +44,12 @@ func root(w http.ResponseWriter, r *http.Request) {
 				ident++
 				id = ident
 				mu_ident.Unlock()
-				key = fmt.Sprintf("%s", id)
+				key = fmt.Sprintf("%d", id)
 			} else {
 				// we have the cookie so we have the ident of this player
 				key = cookie.Value // this is the id in string form
 			}
-			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%d\n%s.wid%d.m3u8", bps, rawstream, key)
+			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%d\n%s.wid%s.m3u8", bps, rawstream, key)
 			expiration := time.Now().Add(24 * time.Hour)
 			newcookie := http.Cookie{Name: rawstream, Value: key, Expires: expiration}
 			http.SetCookie(w, &newcookie)
@@ -80,13 +80,13 @@ func root(w http.ResponseWriter, r *http.Request) {
 				}
 				fmt.Sscanf(spl[1], "wid%d", &id) // wid9876
 				file := spl[0] + ".m3u8"         // rawstream = spl[0]
-				fileinfo, err := os.Stat(rootdir + "live/old/" + file)
+				fileinfo, err := os.Stat(rootdir + "old/" + file)
 				if err != nil {
 					http.NotFound(w, r)
 					return
 				} else {
 					// open the old/file.m3u8 (forecast pre-caching mechanism for CDNs)
-					fr, errn := os.Open(rootdir + "live/old/" + file)
+					fr, errn := os.Open(rootdir + "old/" + file)
 					if errn != nil {
 						http.Error(w, "Internal Server Error", 500)
 						return
