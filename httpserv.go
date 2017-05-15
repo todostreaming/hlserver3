@@ -49,7 +49,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 				// we have the cookie so we have the ident of this player
 				key = cookie.Value // this is the id in string form
 			}
-			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%d\n%s.wid%s.m3u8", bps, rawstream, key)
+			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%d\n%s.wid%s.m3u8\n", bps, rawstream, key)
 			expiration := time.Now().Add(24 * time.Hour)
 			newcookie := http.Cookie{Name: rawstream, Value: key, Expires: expiration}
 			http.SetCookie(w, &newcookie)
@@ -61,7 +61,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Accept-Ranges", "bytes")
-			fmt.Fprintf(w, "%s\n", resp)
+			fmt.Fprintf(w, "%s", resp)
 			return
 		} else if strings.Contains(path, ".wid") { // recursive identified playlist
 			// live/luztv-livestream.wid45006.m3u8
@@ -168,7 +168,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Accept-Ranges", "bytes")
-		fmt.Fprintf(w, "%s\n", resp) // here the response is the .ts or just a blank string
+		fmt.Fprintf(w, "%s", resp) // here the response is the .ts or just a blank string
 	} else { // regular web content
 
 	}
