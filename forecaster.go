@@ -9,8 +9,9 @@ import (
 	"time"
 )
 
-// grep "EXT-X-MEDIA-SEQUENCE" luztv-livestream.m3u8
-// #EXT-X-MEDIA-SEQUENCE:7173
+// /var/segments/live = will contain the realtime m3u8 playlists and .ts segments
+// /var/segments/new = will contain the new playlist with the latest segment to pre-fetch in cache
+// /var/segments/old = will contain the real playlist to be played with .ts already pre-fetched in caches (no need to access backend)
 func diskforecastmechanism() {
 	lastseq := map[string]int{} // lastseq["luztv-livestream.m3u8"] = 7173
 	var err error
@@ -21,8 +22,10 @@ func diskforecastmechanism() {
 		for k, _ := range lastseq {
 			if _, err = os.Stat(rootdir + "live/" + k); os.IsNotExist(err) {
 				delete(lastseq, k)
-				exec.Command("/bin/sh", "-c", "rm "+rootdir+"live/old/"+k).Run()
-				exec.Command("/bin/sh", "-c", "rm "+rootdir+"live/new/"+k).Run()
+				str1 := fmt.Sprintf("rm %sold/%s", rootdir, k)
+				str2 := fmt.Sprintf("rm %snew/%s", rootdir, k)
+				exec.Command("/bin/sh", "-c", str1).Run()
+				exec.Command("/bin/sh", "-c", str2).Run()
 			}
 		}
 		// 2.- Listar m3u8 de /live y vemos sus media-sequence para determinar cuales actualizar/introducir por primera vez, y cuales no actualizar.
@@ -30,7 +33,8 @@ func diskforecastmechanism() {
 		//     Los que se introduzcan por primera vez: cp /live /new
 		//     Los que no actualizan ni se tocan
 		list := []string{} // list of m3u8 in /live
-		cmd := exec.Command("/bin/sh", "-c", "ls -1 "+rootdir+"/live/ | grep .m3u8")
+		str3 := fmt.Sprintf("ls -1 %slive/ | grep .m3u8", rootdir)
+		cmd := exec.Command("/bin/sh", "-c", str3)
 		stdoutRead, _ := cmd.StdoutPipe()
 		reader := bufio.NewReader(stdoutRead)
 		cmd.Start()
@@ -46,15 +50,21 @@ func diskforecastmechanism() {
 		// ya tenemos el listado de ficheros m3u8 en /live ([]list), lo recorremos completo
 		for _, v := range list {
 			msq := getmediaseqnum(rootdir + "live/" + v)
+			if msq == 0 {
+				continue
+			}
 			val, ok := lastseq[v]
 			if !ok { // es  nuevo hay q darlo de alta
 				lastseq[v] = msq
-				exec.Command("/bin/sh", "-c", "cp "+rootdir+"live/"+v+" "+rootdir+"new/").Run()
+				str4 := fmt.Sprintf("cp %slive/%s %snew/", rootdir, v, rootdir)
+				exec.Command("/bin/sh", "-c", str4).Run()
 			} else {
 				if msq != val {
 					lastseq[v] = msq
-					exec.Command("/bin/sh", "-c", "cp "+rootdir+"new/"+v+" "+rootdir+"old/").Run()
-					exec.Command("/bin/sh", "-c", "cp "+rootdir+"live/"+v+" "+rootdir+"new/").Run()
+					str5 := fmt.Sprintf("cp %snew/%s %sold/", rootdir, v, rootdir)
+					str6 := fmt.Sprintf("cp %slive/%s %snew/", rootdir, v, rootdir)
+					exec.Command("/bin/sh", "-c", str5).Run()
+					exec.Command("/bin/sh", "-c", str6).Run()
 				}
 			}
 		}
