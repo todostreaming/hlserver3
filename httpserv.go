@@ -277,7 +277,7 @@ func createstats(r *http.Request, rawstream string, id int64) {
 			seconds := timestamp - int64(timestamp_db)
 			if seconds > 30 { // reconnected from a previous disconn
 				mu_dblive.Lock()
-				dblive.Exec("UPDATE players SET time = 0, total_time = ? WHERE id = ?", timestamp, id)
+				dblive.Exec("UPDATE players SET time = 0, timestamp = ? WHERE id = ?", timestamp, id)
 				mu_dblive.Unlock()
 			} else { // still connected
 				KBs := kilobytes_db + (int64(bw) * seconds / 8192)
