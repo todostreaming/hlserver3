@@ -15,6 +15,9 @@ var (
 	// DB Live vars
 	dblive    *sql.DB    // db only with live players raw info
 	mu_dblive sync.Mutex // also exclusive mutex for
+	// DB mutexes
+	dbday_mu sync.RWMutex
+	dbmon_mu sync.RWMutex
 	// GeoIP2 vars
 	dbgeoip    *geoip2.Reader
 	mu_dbgeoip sync.Mutex
