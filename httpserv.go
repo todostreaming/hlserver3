@@ -233,22 +233,61 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
+-- -----------------------------------------------------------------
+-- Table structure for players
+-- -----------------------------------------------------------------
+-- id (64 bits) = variant playlist from wid%d
+-- username		= 1st part in stream
+-- streamname	= 2nd part in stream
+-- os			= "win", "lin", "mac", "and", "other"
+-- ipproxy		= ip from the near proxy CDN
+-- ipclient		= remote ip
+-- isocode		= ISO 3166-2 country code
+-- country		= complete country name
+-- city			= complete name of city
+-- timestamp	= UNIX 64 bits timestamp of latest update
+-- time			= seconds connected since the latest disconnection
+-- kilobytes	= total kilobytes transferred
+-- total_time	= total seconds connected today in all
+-- -----------------------------------------------------------------
+CREATE TABLE "players" (
+"id"  INTEGER PRIMARY KEY NOT NULL,
+"username"  TEXT(255),
+"streamname"  TEXT(255),
+"os"  TEXT(7),
+"ipproxy"  TEXT(255),
+"ipclient"  TEXT(255),
+"isocode"  TEXT(4),
+"country"  TEXT(255),
+"city"  TEXT(255),
+"timestamp"  INTEGER,
+"time"  INTEGER,
+"kilobytes"  INTEGER,
+"total_time"  INTEGER
+);
+*/
 // just record in live.db @ table players (insert or update)
 func createstats(r *http.Request, rawstream string, id int64) {
-	/*
-		Remote-Ip => [79.109.178.183]
-		X-Remote-Ip => [79.109.178.183]
-	*/
-	var remoteip string
+	// lets collect all the info to save in live.db
+	var ipclient, ipproxy, username, streamname, os string
+	var country, isocode, city string
+
+	tr := strings.Split(rawstream, "-")
+	if len(tr) != 2 {
+		return
+	}
+	username, streamname = tr[0], tr[1]
 	value, ok := r.Header["Remote-Ip"]
 	if !ok {
-		remoteip = r.RemoteAddr
+		ipclient = getip(r.RemoteAddr)
 	} else {
-		remoteip = value[0]
+		ipclient = value[0]
 	}
-	tr := strings.Split(r.RemoteAddr, ":")
-	spl := strings.Split(remoteip, ":")
-	fmt.Printf("id=%d, rawstream=%s, ipproxy=%s, ipclient=%s, agent=%s, referer=%s\r", id, rawstream, tr[0], spl[0], r.UserAgent(), r.Referer())
+	ipproxy = getip(r.RemoteAddr)
+	os = getos(r.UserAgent())
+	country, isocode, city = geoIP(ipclient)
+
 	// maxmind geoip2 from (github.com/oschwald/geoip2-golang) loaded on RAM, only once openned and exclusive mutex locked at every read
 
 	return

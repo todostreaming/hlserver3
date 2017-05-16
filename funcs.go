@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// separa la IPv4/6 del puerto usado con la misma
+// splits the IPv4/6 from the port used
 func getip(pseudoip string) string {
 	var res string
 	if strings.Contains(pseudoip, "]:") {
@@ -22,7 +22,7 @@ func getip(pseudoip string) string {
 	return res
 }
 
-// convierte un string numérico en un entero int
+// converts a string to a numerical integer
 func toInt(cant string) (res int) {
 	res, _ = strconv.Atoi(cant)
 	return
@@ -33,10 +33,12 @@ func random(min, max int) int { // [min,max)
 	return rand.Intn(max-min) + min
 }
 
-func geoIP(ip_parsing string) (country, isocode, city string) {
+func geoIP(ipaddr string) (country, isocode, city string) {
 	// If you are using strings that may be invalid, check that ip is not nil
-	ip := net.ParseIP(ip_parsing)
+	ip := net.ParseIP(ipaddr)
+	mu_dbgeoip.Lock()
 	record, err := dbgeoip.City(ip)
+	mu_dbgeoip.Unlock()
 	if err != nil {
 		return
 	}
@@ -74,7 +76,7 @@ func controlinternalsessions() {
 	}
 }
 
-// genera una session id o Value del Cookie aleatoria y de la longitud que se quiera
+// generates a session id or Value for a random Cookie with a fixed length
 func sessionid(r *rand.Rand, n int) string {
 	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
@@ -83,4 +85,18 @@ func sessionid(r *rand.Rand, n int) string {
 		b[i] = letterRunes[r.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+// get os from useragent
+func getos(agent string) string {
+	os := "other"
+
+	for key, value := range userAgent {
+		if strings.Contains(agent, value) {
+			os = key
+			break
+		}
+	}
+
+	return os
 }

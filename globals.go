@@ -34,4 +34,6 @@ var (
 	time_   map[string]time.Time = make(map[string]time.Time)
 	type_   map[string]int       = make(map[string]int)
 	mu_user sync.Mutex
+	// user agents for OS's
+	userAgent = map[string]string{"win": "Windows", "mac": "Mac OS X", "and": "Android", "lin": "Linux"}
 )
