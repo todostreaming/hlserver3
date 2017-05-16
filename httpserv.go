@@ -233,40 +233,6 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*
--- -----------------------------------------------------------------
--- Table structure for players
--- -----------------------------------------------------------------
--- id (64 bits) = variant playlist from wid%d
--- username		= 1st part in stream
--- streamname	= 2nd part in stream
--- os			= "win", "lin", "mac", "and", "other"
--- ipproxy		= ip from the near proxy CDN
--- ipclient		= remote ip
--- isocode		= ISO 3166-2 country code
--- country		= complete country name
--- city			= complete name of city
--- timestamp	= UNIX 64 bits timestamp of latest update
--- time			= seconds connected since the latest disconnection
--- kilobytes	= total kilobytes transferred
--- total_time	= total seconds connected today in all
--- -----------------------------------------------------------------
-CREATE TABLE "players" (
-"id"  INTEGER PRIMARY KEY NOT NULL,
-"username"  TEXT(255),
-"streamname"  TEXT(255),
-"os"  TEXT(7),
-"ipproxy"  TEXT(255),
-"ipclient"  TEXT(255),
-"isocode"  TEXT(4),
-"country"  TEXT(255),
-"city"  TEXT(255),
-"timestamp"  INTEGER,
-"time"  INTEGER,
-"kilobytes"  INTEGER,
-"total_time"  INTEGER
-);
-*/
 // just record in live.db @ table players (insert or update)
 func createstats(r *http.Request, rawstream string, id int64) {
 	// lets collect all the info to save in live.db
@@ -287,8 +253,40 @@ func createstats(r *http.Request, rawstream string, id int64) {
 	ipproxy = getip(r.RemoteAddr)
 	os = getos(r.UserAgent())
 	country, isocode, city = geoIP(ipclient)
+	timestamp := time.Now().Unix()
 
-	// maxmind geoip2 from (github.com/oschwald/geoip2-golang) loaded on RAM, only once openned and exclusive mutex locked at every read
-
-	return
+	// store everything in live.db
+	mu_dblive.Lock()
+	_, err := dblive.Exec("INSERT INTO players (`id`, `username`, `streamname`, `os`, `ipproxy`, `ipclient`, `isocode`, `country`, `city`, `timestamp`, `time`, `kilobytes`, `total_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		id, username, streamname, os, ipproxy, ipclient, isocode, country, city, timestamp, 0, 0, 0)
+	mu_dblive.Unlock()
+	if err != nil {
+		if strings.Contains(err.Error(), "constraint") { // UNIQUE constraint failed: players.id // this id existed
+			// let's get: timestamp, time, kilobytes, total_time and bandwith(rawstream) // ["luztv-livestream"] = 3780000 bps
+			bw := 0
+			bandwidth, ok := Bw_int.Load(rawstream)
+			if ok {
+				bw = bandwidth.(int)
+			}
+			var timestamp_db, time_db, kilobytes_db, total_time_db int64
+			err := dblive.QueryRow("SELECT timestamp, time, kilobytes, total_time FROM players WHERE id = ?", id).Scan(&timestamp_db, &time_db, &kilobytes_db, &total_time_db)
+			if err != nil {
+				Error.Println(err)
+				return
+			}
+			seconds := timestamp - int64(timestamp_db)
+			if seconds > 30 { // reconnected from a previous disconn
+				mu_dblive.Lock()
+				dblive.Exec("UPDATE players SET time = 0, total_time = ? WHERE id = ?", timestamp, id)
+				mu_dblive.Unlock()
+			} else { // still connected
+				KBs := kilobytes_db + (int64(bw) * seconds / 8192)
+				mu_dblive.Lock()
+				dblive.Exec("UPDATE players SET time = ?, total_time = ?, kilobytes = ?, timestamp = ? WHERE id = ?", time_db+seconds, total_time_db+seconds, KBs, timestamp, id)
+				mu_dblive.Unlock()
+			}
+		} else {
+			Error.Println(err)
+		}
+	}
 }

@@ -17,9 +17,9 @@ BEGIN TRANSACTION;
 -- country		= complete country name
 -- city			= complete name of city
 -- timestamp	= UNIX 64 bits timestamp of latest update
--- time			= seconds connected since the latest disconnection
+-- time			= seconds connected since the latest reconnection
 -- kilobytes	= total kilobytes transferred
--- total_time	= total seconds connected today in all
+-- total_time	= total seconds connected in all
 -- -----------------------------------------------------------------
 CREATE TABLE "players" (
 "id"  INTEGER PRIMARY KEY NOT NULL,
