@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
+	"mime"
 	"net/http"
 	"os"
 	"strings"
@@ -120,8 +122,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		} else {
-			fr, errn := os.Open(rootdir + path)
-			if errn != nil {
+			fr, err := os.Open(rootdir + path)
+			if err != nil {
 				http.Error(w, "Internal Server Error", 500)
 				return
 			}
@@ -168,9 +170,66 @@ func root(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Accept-Ranges", "bytes")
-		fmt.Fprintf(w, "%s", resp) // here the response is the .ts or just a blank string
-	} else { // regular web content
-
+		fmt.Fprintf(w, "%s", resp) // here the response is the .ts file or just a blank string
+	} else { // regular web content: http://hlserver.com/path_to_file
+		file := rootdir + path
+		fileinfo, err := os.Stat(file)
+		if err != nil { // does not exist the path (file nor dir)
+			http.NotFound(w, r)
+			return
+		} else if fileinfo.IsDir() { // it is a dir
+			if strings.HasSuffix(file, "/") { // add /index.html to the end
+				file = file + first_page + ".html"
+			} else {
+				file = file + "/" + first_page + ".html"
+			}
+		}
+		fr, err := os.Open(file)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			return
+		}
+		defer fr.Close()
+		if session {
+			if strings.Contains(r.URL.String(), "?err") {
+				// replace <span id="loginerr"></span> with an error text to show
+				buf, _ := ioutil.ReadAll(fr)
+				html := string(buf)
+				html = strings.Replace(html, spanHTMLlogerr, ErrorText, -1)
+				w.Header().Set("Content-Type", mime.TypeByExtension(".html"))
+				fmt.Fprint(w, html)
+			} else {
+				// Get the cookies
+				filepart := strings.Split(file, ".")
+				if (filepart[1] != "html") || (filepart[0] == (rootdir + first_page)) {
+					http.ServeContent(w, r, file, fileinfo.ModTime(), fr)
+				} else {
+					cookie, err := r.Cookie(CookieName)
+					if err != nil {
+						Error.Println("Cookie not found in the browser")
+						http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+					} else {
+						key := cookie.Value
+						mu_user.Lock()
+						_, ok := user_[key]
+						mu_user.Unlock()
+						if ok {
+							cookie.Expires = time.Now().Add(time.Duration(session_timeout) * time.Second)
+							http.SetCookie(w, cookie)
+							mu_user.Lock()
+							time_[cookie.Value] = cookie.Expires
+							mu_user.Unlock()
+							http.ServeContent(w, r, file, fileinfo.ModTime(), fr)
+						} else {
+							Error.Println("Cookie not found in the server")
+							http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+						}
+					}
+				}
+			}
+		} else {
+			http.ServeContent(w, r, file, fileinfo.ModTime(), fr)
+		}
 	}
 }
 

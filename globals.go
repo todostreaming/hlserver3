@@ -6,6 +6,7 @@ import (
 	"golang.org/x/sync/syncmap"
 	"log"
 	"sync"
+	"time"
 )
 
 var (
@@ -28,4 +29,9 @@ var (
 	Referer *syncmap.Map
 	// forecasters map ( ["near_proxy=rawstream"] = UNIXtimestamp_int64 )
 	Forecaster *syncmap.Map
+	// internal session maps
+	user_   map[string]string    = make(map[string]string)
+	time_   map[string]time.Time = make(map[string]time.Time)
+	type_   map[string]int       = make(map[string]int)
+	mu_user sync.Mutex
 )
