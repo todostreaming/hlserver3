@@ -196,12 +196,14 @@ func root(w http.ResponseWriter, r *http.Request) {
 				buf, _ := ioutil.ReadAll(fr)
 				html := string(buf)
 				html = strings.Replace(html, spanHTMLlogerr, ErrorText, -1)
+				w.Header().Set("Cache-Control", "no-cache")
 				w.Header().Set("Content-Type", mime.TypeByExtension(".html"))
 				fmt.Fprint(w, html)
 			} else {
 				// Get the cookies
 				filepart := strings.Split(file, ".")
 				if (filepart[1] != "html") || (filepart[0] == (rootdir + first_page)) {
+					w.Header().Set("Cache-Control", "no-cache")
 					http.ServeContent(w, r, file, fileinfo.ModTime(), fr)
 				} else {
 					cookie, err := r.Cookie(CookieName)
@@ -219,6 +221,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 							mu_user.Lock()
 							time_[cookie.Value] = cookie.Expires
 							mu_user.Unlock()
+							w.Header().Set("Cache-Control", "no-cache")
 							http.ServeContent(w, r, file, fileinfo.ModTime(), fr)
 						} else {
 							Error.Println("Cookie not found in the server")
@@ -228,6 +231,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		} else {
+			w.Header().Set("Cache-Control", "no-cache")
 			http.ServeContent(w, r, file, fileinfo.ModTime(), fr)
 		}
 	}

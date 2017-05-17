@@ -227,7 +227,7 @@ func maintenance() {
 				dblive.Exec("DELETE FROM players WHERE timestamp < ?", limit_time)
 				mu_dblive.Unlock()
 				// Se seleccionan el total de Ips, las horas totales y el total de Gigabytes
-				query, err := dblive.Query("SELECT count(ipclient), sum(total_time)/3600, sum(kilobytes)/1000000, username, streamname FROM players GROUP BY username, streamname")
+				query, err := dblive.Query("SELECT count(id), sum(total_time)/3600, sum(kilobytes)/1000000, username, streamname FROM players GROUP BY username, streamname")
 				if err != nil {
 					Error.Println(err)
 				}
@@ -250,7 +250,7 @@ func maintenance() {
 					// Se seleccionan el máximo de usuarios conectados, y la hora:min de la dayly antigua
 					// SELECT sum(count) AS cuenta, username, streamname, hour, minutes FROM resumen WHERE username = ? AND streamname = ? GROUP BY username, streamname, hour, minutes ORDER BY cuenta DESC
 					dbday_mu.RLock()
-					err := db1.QueryRow("SELECT sum(count) AS cuenta, username, streamname, hour, minutes FROM resumen WHERE username = ? AND streamname = ? GROUP BY username, streamname, hour, minutes ORDER BY cuenta DESC", userName, streamName).Scan(&pico, &userName, &streamName, &horapico, &minpico)
+					err := db1.QueryRow("SELECT sum(players) AS cuenta, username, streamname, hour, minutes FROM resumen WHERE username = ? AND streamname = ? GROUP BY username, streamname, hour, minutes ORDER BY cuenta DESC", userName, streamName).Scan(&pico, &userName, &streamName, &horapico, &minpico)
 					dbday_mu.RUnlock()
 					if err != nil {
 						Error.Println(err)
@@ -258,7 +258,7 @@ func maintenance() {
 					hourMin := fmt.Sprintf("%02d:%02d", horapico, minpico) //hour:min para monthly.db
 					dbmon_mu.Lock()
 					// Inserto los datos de resumen mensual
-					_, err1 := db2.Exec("INSERT INTO resumen (`username`,`streamname`, `audiencia`, `minutos`, `pico`, `horapico`, `megabytes`, `fecha`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+					_, err1 := db2.Exec("INSERT INTO resumen (`username`,`streamname`, `players`, `minutes`, `peak`, `peaktime`, `gigabytes`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 						userName, streamName, ips, horas, pico, hourMin, gigas, fechaMonth)
 					dbmon_mu.Unlock()
 					if err1 != nil {
@@ -277,24 +277,24 @@ func maintenance() {
 		// Solo grabaremos en este minuto en dayly.db los q estan activos ahora mismo
 		tiempo_limite := time.Now().Unix() - 30
 		var user, stream, so, isocode string
-		var num_filas, total_time, total_kb int
+		var num_filas, total_time, total_kb, proxies int
 		db3, err := sql.Open("sqlite3", dirDaylys+fecha_actual+"dayly.db") // Apertura de dateDayly.db
 		if err != nil {
 			Error.Println(err)
 		}
-		query, err := dblive.Query("SELECT count(ipclient), username, streamname, os,  isocode, sum(total_time), sum(kilobytes) FROM players WHERE timestamp > ? AND time > 0 GROUP BY username, streamname, os, isocode", tiempo_limite)
+		query, err := dblive.Query("SELECT count(id), username, streamname, os, isocode, sum(total_time), sum(kilobytes), count(distinct(proxies)) FROM players WHERE timestamp > ? AND time > 0 GROUP BY username, streamname, os, isocode", tiempo_limite)
 		if err != nil {
 			Error.Println(err)
 		}
 		for query.Next() {
-			err = query.Scan(&num_filas, &user, &stream, &so, &isocode, &total_time, &total_kb)
+			err = query.Scan(&num_filas, &user, &stream, &so, &isocode, &total_time, &total_kb, &proxies)
 			if err != nil {
 				Error.Println(err)
 			}
 			dbday_mu.Lock()
 			// inserto los datos de resumen
-			_, err1 := db3.Exec("INSERT INTO resumen (`username`, `streamname`, `os`, `isocode`, `time`, `kilobytes`, `count`, `hour`, `minutes`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-				user, stream, so, isocode, total_time, total_kb, num_filas, hh, mm, fecha_actual)
+			_, err1 := db3.Exec("INSERT INTO resumen (`username`, `streamname`, `os`, `isocode`, `time`, `kilobytes`, `players`, `proxies`, `hour`, `minutes`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				user, stream, so, isocode, total_time, total_kb, num_filas, proxies, hh, mm, fecha_actual)
 			dbday_mu.Unlock()
 			if err1 != nil {
 				Error.Println(err1)
