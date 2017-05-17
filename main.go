@@ -76,11 +76,7 @@ func main() {
 	go diskforecastmechanism()
 
 	http.HandleFunc("/", root)
-	// testing functions
-	http.HandleFunc("/filldb.cgi", filldb)
-	http.HandleFunc("/geoip.cgi", geoip)
-	http.HandleFunc("/cookies.cgi", cookies)
-	http.HandleFunc("/delcookies.cgi", delcookies)
+	// all the CGIs used
 
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }
