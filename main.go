@@ -282,7 +282,7 @@ func maintenance() {
 		if err != nil {
 			Error.Println(err)
 		}
-		query, err := dblive.Query("SELECT count(id), username, streamname, os, isocode, sum(total_time), sum(kilobytes), count(distinct(proxies)) FROM players WHERE timestamp > ? AND time > 0 GROUP BY username, streamname, os, isocode", tiempo_limite)
+		query, err := dblive.Query("SELECT count(id), username, streamname, os, isocode, sum(total_time), sum(kilobytes), count(distinct(ipproxy)) FROM players WHERE timestamp > ? AND time > 0 GROUP BY username, streamname, os, isocode", tiempo_limite)
 		if err != nil {
 			Error.Println(err)
 		}
