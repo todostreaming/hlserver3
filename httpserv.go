@@ -212,9 +212,9 @@ func root(w http.ResponseWriter, r *http.Request) {
 						http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 					} else {
 						key := cookie.Value
-						mu_user.Lock()
+						mu_user.RLock()
 						_, ok := user_[key]
-						mu_user.Unlock()
+						mu_user.RUnlock()
 						if ok {
 							cookie.Expires = time.Now().Add(time.Duration(session_timeout) * time.Second)
 							http.SetCookie(w, cookie)
