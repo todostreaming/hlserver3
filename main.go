@@ -24,7 +24,7 @@ func init() {
 	// Logging errors machanism
 	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalln("Fallo al abrir el archivo de error:", err)
+		log.Fatalln("Fails openning the logging file:", err)
 	}
 	Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 	Warning = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -32,14 +32,16 @@ func init() {
 	// Live DB
 	dblive, err = sql.Open("sqlite3", "/var/db/live.db") // on RAMdisk
 	if err != nil {
-		log.Fatalln("Fallo al abrir el archivo DB:", err)
+		log.Fatalln("Fails openning live.db:", err)
 	}
 	dblive.Exec("PRAGMA journal_mode=WAL;")
 	// GeoIP2 DB
 	dbgeoip, err = geoip2.Open("/var/db/GeoIP2-City.mmdb")
 	if err != nil {
-		log.Fatalln("Fallo al abrir el GeoIP2:", err)
+		log.Fatalln("Fails openning GeoIP2 City DB:", err)
 	}
+	// load all referers to the RAM map
+	loadallreferers()
 	// empty the bitrates map
 	Bw_int = new(syncmap.Map)
 	// empty the referer map

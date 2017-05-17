@@ -1,12 +1,41 @@
 package main
 
 import (
+	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
+	"log"
 	"math/rand"
 	"net"
 	"strconv"
 	"strings"
 	"time"
 )
+
+// load referer table from general.db and mirror to Referer syncmap
+// any error will make it exit immediately
+func loadallreferers() {
+	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db") // Apertura de la dateDayly.db antigua para lectura del pico/hora
+	if err != nil {
+		log.Fatalln("Fails openning general.db:", err)
+	}
+	defer dbgeneral.Close()
+	dbgen_mu.RLock()
+	query, err := dbgeneral.Query("SELECT username, streamname, referrers FROM referer")
+	dbgen_mu.RUnlock()
+	if err != nil {
+		log.Fatalln("Fails querying general.db:", err)
+		return
+	}
+	defer query.Close()
+	for query.Next() {
+		var user, stream, referer string
+		err = query.Scan(&user, &stream, &referer)
+		if err != nil {
+			log.Fatalln("Fails scanning general.db:", err)
+		}
+		Referer.Store(user+"-"+stream, referer)
+	}
+}
 
 // splits the IPv4/6 from the port used
 func getip(pseudoip string) string {

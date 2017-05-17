@@ -18,6 +18,7 @@ var (
 	// DB mutexes
 	dbday_mu sync.RWMutex
 	dbmon_mu sync.RWMutex
+	dbgen_mu sync.RWMutex
 	// GeoIP2 vars
 	dbgeoip    *geoip2.Reader
 	mu_dbgeoip sync.Mutex
