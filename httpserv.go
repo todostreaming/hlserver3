@@ -142,6 +142,20 @@ func root(w http.ResponseWriter, r *http.Request) {
 			io.Copy(w, fr)
 			return
 		}
+	} else if strings.Contains(path, "/forecaster.js") {
+		// this code will send the javascript code for the forecaster mechanism of pre-caching
+		// http://hlserver/rawstream/forecaster.js (path = rawstream/forecaster.js)
+		tr := strings.Split(path, "/")                                                     // rawstream = tr[0]
+		jscode := fmt.Sprintf("$.ajax({ url : \"/live/%s.lst\", type : 'HEAD' });", tr[0]) // the JS code is not complete, needs to reload every 10 seconds
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Expose-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Accept-Ranges", "bytes")
+		fmt.Fprintf(w, "%s", jscode)
 	} else if strings.Contains(path, ".lst") { // latest segment to pre-cache (forecaster map)
 		// http://hlserver3/live/luztv-livestream.lst
 		// tail -1 /var/segments/new/luztv-livestream.m3u8
