@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/oschwald/geoip2-golang"
+	"github.com/todostreaming/gohw"
 	"golang.org/x/sync/syncmap"
 	"log"
 	"sync"
@@ -12,6 +13,8 @@ import (
 var (
 	ident    int64      // identifier for every streaming session openned by an individual player
 	mu_ident sync.Mutex // exclusive mutex for the identifier
+	numgo    int        //number of goroutines working
+	Hardw    *gohw.GoHw
 	// DB Live vars
 	dblive    *sql.DB    // db only with live players raw info
 	mu_dblive sync.Mutex // also exclusive mutex for
@@ -40,4 +43,7 @@ var (
 	mu_user sync.RWMutex
 	// user agents for OS's
 	userAgent = map[string]string{"win": "Windows", "mac": "Mac OS X", "and": "Android", "lin": "Linux"}
+	// settings.reg file
+	cloud    map[string]string = make(map[string]string)
+	mu_cloud sync.Mutex
 )

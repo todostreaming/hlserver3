@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"math/rand"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -102,4 +104,25 @@ func getos(agent string) string {
 	}
 
 	return os
+}
+
+func loadSettings(filename string) {
+	fr, err := os.Open(filename)
+	defer fr.Close()
+	if err == nil {
+		reader := bufio.NewReader(fr)
+		for {
+			linea, rerr := reader.ReadString('\n')
+			if rerr != nil {
+				break
+			}
+			linea = strings.TrimRight(linea, "\n")
+			item := strings.Split(linea, " = ")
+			mu_cloud.Lock()
+			if len(item) == 2 {
+				cloud[item[0]] = item[1]
+			}
+			mu_cloud.Unlock()
+		}
+	}
 }

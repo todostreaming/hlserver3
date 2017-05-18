@@ -7,6 +7,7 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/oschwald/geoip2-golang"
+	"github.com/todostreaming/gohw"
 	"golang.org/x/sync/syncmap"
 	"io"
 	"io/ioutil"
@@ -30,15 +31,30 @@ func init() {
 	Warning = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
 	Error = log.New(io.MultiWriter(file, os.Stderr), "ERROR :", log.Ldate|log.Ltime|log.Lshortfile)
 	// Live DB
-	dblive, err = sql.Open("sqlite3", "/var/db/live.db") // on RAMdisk
+	if _, err := os.Stat(DirRamDB + "live.db"); err != nil { // 1st execution, or machine rebooted
+		exec.Command("/bin/sh", "-c", fmt.Sprintf("cp -f %slive.db* %s", DirDB, DirRamDB)).Run()
+		exec.Command("/bin/sh", "-c", "sync").Run()
+	}
+	dblive, err = sql.Open("sqlite3", DirRamDB+"live.db")
 	if err != nil {
+		Error.Println(err)
 		log.Fatalln("Fails openning live.db:", err)
 	}
 	dblive.Exec("PRAGMA journal_mode=WAL;")
-	// GeoIP2 DB
-	dbgeoip, err = geoip2.Open("/var/db/GeoIP2-City.mmdb")
+	err = dblive.Ping()
 	if err != nil {
-		log.Fatalln("Fails openning GeoIP2 City DB:", err)
+		Error.Println(err)
+		log.Fatalln("Fails accessing live.db:", err)
+	}
+
+	// GeoIP2 DB
+	if _, err := os.Stat(DirRamDB + "GeoIP2-City.mmdb"); err != nil { // es la primera ejecución, o hemos reiniciado la maquina (reboot)
+		exec.Command("/bin/sh", "-c", fmt.Sprintf("cp -f %sGeoIP2-City.mmdb* %s", DirDB, DirRamDB)).Run()
+		exec.Command("/bin/sh", "-c", "sync").Run()
+	}
+	dbgeoip, err = geoip2.Open(DirRamDB + "GeoIP2-City.mmdb")
+	if err != nil {
+		log.Fatal("Fails openning GeoIP2 City DB:", err)
 	}
 	// load all referers to the RAM map
 	loadallreferers()
@@ -51,24 +67,40 @@ func init() {
 }
 
 func main() {
+	fmt.Printf("Golang HTTP Server starting at Port %s ...\n", http_port)
+	if session {
+		fmt.Println("SESSION Cookies capability enabled !!!")
+	} else {
+		fmt.Println("SESSION Cookies capability disabled !!!")
+	}
+	if session { // will delete expired sessions previously recorded
+		go controlinternalsessions()
+	}
+
+	loadSettings(playingsRoot)
+	Hardw = gohw.Hardware()
+	Hardw.Run("eth0")
 	// Handlers del Servidor HTTP
 	s := &http.Server{
-		Addr:           ":9999",          // config http port
+		Addr:           ":" + http_port,  // config http port
 		Handler:        nil,              // Default Muxer for handler as usual
 		ReadTimeout:    20 * time.Second, // send a segment in POST body
 		WriteTimeout:   20 * time.Second, // receive a segment in GET req
 		MaxHeaderBytes: 1 << 13,          // 8K as Apache and others
 	}
+
 	go func() {
-		var old, num, max int
 		for {
-			num = runtime.NumGoroutine()
-			if num > old {
-				max = num
-			}
-			fmt.Printf("%d / %d                            \r", runtime.NumGoroutine(), max)
+			time.Sleep(1 * time.Minute)
+			exec.Command("/bin/sh", "-c", fmt.Sprintf("cp -f %slive.db* %s", DirRamDB, DirDB)).Run()
+			exec.Command("/bin/sh", "-c", "sync").Run()
+		}
+	}()
+	go func() {
+		for {
+			numgo = runtime.NumGoroutine()
 			time.Sleep(100 * time.Millisecond)
-			old = num
+
 		}
 	}()
 	go encoder()
@@ -76,8 +108,38 @@ func main() {
 	go diskforecastmechanism()
 
 	http.HandleFunc("/", root)
+	http.HandleFunc(login_cgi, login)
+	http.HandleFunc(logout_cgi, logout)
 	// all the CGIs used
-
+	/*
+		http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
+		http.HandleFunc("/playerStatNow.cgi", playerStatNow)
+		http.HandleFunc("/consultaFecha.cgi", consultaFecha)
+		http.HandleFunc("/firstFecha.cgi", firstFecha)
+		http.HandleFunc("/getMonthsYears.cgi", getMonthsYears)
+		http.HandleFunc("/giveFecha.cgi", giveFecha)
+		http.HandleFunc("/zeroFields.cgi", zeroFields)
+		http.HandleFunc("/formatDaylyhtml.cgi", formatDaylyhtml)
+		http.HandleFunc("/createGraf.cgi", createGraf)
+		http.HandleFunc("/firstMonthly.cgi", firstMonthly)
+		http.HandleFunc("/graficosMonthly.cgi", graficosMonthly)
+		http.HandleFunc("/play.cgi", play)
+		http.HandleFunc("/publish.cgi", publish)
+		http.HandleFunc("/onplay.cgi", onplay)
+		http.HandleFunc("/getMonthsYearsAdmin.cgi", getMonthsYearsAdmin)
+		http.HandleFunc("/putMonthlyAdmin.cgi", putMonthlyAdmin)
+		http.HandleFunc("/putMonthlyAdminChange.cgi", putMonthlyAdminChange)
+		http.HandleFunc("/editar_admin.cgi", editar_admin)
+		http.HandleFunc("/editar_cliente.cgi", editar_cliente)
+		http.HandleFunc("/user_admin.cgi", user_admin)
+		http.HandleFunc("/changeStatus.cgi", changeStatus)
+		http.HandleFunc("/nuevoCliente.cgi", nuevoCliente)
+		http.HandleFunc("/borrarCliente.cgi", borrarCliente)
+		http.HandleFunc("/buscarClientes.cgi", buscarClientes)
+		http.HandleFunc("/totalMonths.cgi", totalMonths)
+		http.HandleFunc("/totalMonthsChange.cgi", totalMonthsChange)
+		http.HandleFunc("/hardware.cgi", gethardware)
+	*/
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }
 
