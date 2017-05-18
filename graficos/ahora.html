@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+            
+
+    <title>Streaming Control Panel</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="css/metisMenu.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="css/dataTables.bootstrap.css" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="css/responsive.dataTables.scss" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <!-- jQuery -->
+    <script src="js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="js/metisMenu.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="js/jquery.dataTables.min.js"></script>
+    <script src="js/dataTables.bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/sb-admin-2.js"></script>
+</head>
+<body>
+<div id="wrapper">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Change navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">HLServer 3.0</a>
+    </div>
+    <ul class="nav navbar-top-links navbar-right hidden-xs">
+        <!-- Boton superior de logout -->
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-user fa-fw"></i><i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user">
+                <li><a href="edit.html"><i class="fa fa-wrench fa-fw"></i> Settings</a></li>
+                <li><a href="ahora.html"><i class="fa fa-bar-chart fa-fw"></i> Now</a></li>
+                <li><a href="dayly.html"><i class="fa fa-pie-chart fa-fw"></i> Dayly</a></li>
+                <li><a href="mensual.html"><i class="fa fa-area-chart fa-fw"></i> Monthly</a></li>
+                <li class="divider"></li>
+                <li><a href="/logout.cgi"><i class="fa fa-sign-out fa-fw"></i> Log out</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="navbar-default sidebar" role="navigation">
+         <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li>
+                        <a href="#"><i class="fa fa-bar-chart fa-fw"></i> Stats<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="ahora.html">Now</a>
+                            </li>
+                            <li>
+                                <a href="dayly.html">Dayly</a>
+                            </li>
+                            <li>
+                                <a href="mensual.html">Montly</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+	                  <a href="edit.html"><i class="fa fa-wrench fa-fw"></i> Settings</a>
+	                </li>
+                    <li>
+                        <a href="/logout.cgi"><i class="fa fa-sign-out fa-fw"></i> Log out</a>
+                    </li>
+                </ul>
+             </div>
+        </div>
+    </nav>
+    <div id="page-wrapper">
+            <br><div class="row">
+            <div align="center">
+                <div id="encoders" class="col-md-6 col-md-offset-3"></div>
+                <div id="players"  class="col-md-12 "></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+        $(document).ready(function(){
+            $.post("/encoderStatNow.cgi", function(data, status) {
+                $("#encoders").html(data);
+            });
+            $.post("/playerStatNow.cgi", function(data, status) {
+                $("#players").html(data);
+            });
+            setInterval("delayedPost()", 10000);
+        });
+        function delayedPost() {
+            $.post("/encoderStatNow.cgi", function(data, status) {
+                $("#encoders").html(data);
+            });
+            $.post("/playerStatNow.cgi", function(data, status) {
+                $("#players").html(data);
+            });
+        }
+        function launch(newURL, newName, newFeatures, orgName) {
+          var remote = open(newURL, newName, newFeatures);
+          if (remote.opener == null) remote.opener = window;
+          remote.opener.name = orgName;
+          return remote;
+        }
+        function launchRemote(url) {
+          myRemote = launch(url, "playtv", "height=429,width=620,channelmode=0,dependent=0,directories=0,fullscreen=0,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0", "myWindow");
+        }
+</script>
+</body>
+</html>

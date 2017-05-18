@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html> 
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="dist/Chart.bundle.js"></script>        
+
+    <title>Streaming Control Panel</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="css/metisMenu.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="css/dataTables.bootstrap.css" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="css/responsive.dataTables.scss" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <!-- jQuery -->
+    <script src="js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="js/metisMenu.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="js/jquery.dataTables.min.js"></script>
+    <script src="js/dataTables.bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/sb-admin-2.js"></script>
+</head>
+ <body>
+<div id="wrapper">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Change navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">HLServer 3.0</a>
+    </div>
+    <ul class="nav navbar-top-links navbar-right hidden-xs">
+        <!-- Boton superior de logout -->
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-user fa-fw"></i><i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user">
+                <li><a href="editarAdmin.html"><i class="fa fa-wrench fa-fw"></i> Settings</a></li>
+                <li><a href="new_client.html"><i class="fa fa-file-o fa-fw"></i> New Client</a></li>
+                <li><a href="del_client.html"><i class="fa fa-eraser fa-fw"></i> Delete Client</a></li>
+                <li><a href="monthly_admin.html"><i class="fa fa-bar-chart fa-fw"></i> Stats</a></li>
+                <li><a href="hardware.html"><i class="fa fa-gear fa-fw"></i> Hardware</a></li>
+                <li class="divider"></li>
+                <li><a href="/logout.cgi"><i class="fa fa-sign-out fa-fw"></i> Log out</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="navbar-default sidebar" role="navigation">
+        <div class="sidebar-nav navbar-collapse">
+            <ul class="nav" id="side-menu">
+            	<li>
+                    <a href="#"><i class="fa fa-pencil-square-o fa-fw"></i> Clients<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+	                    <li>
+	                    	<a href="new_client.html"> New Client</a>
+	                    </li>
+	                    <li>
+	                    	<a href="del_client.html"> Delete Client</a>
+	                    </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="monthly_admin.html"><i class="fa fa-calendar fa-fw"></i> Stats</a>
+                </li>
+                <li>
+                    <a href="hardware.html"><i class="fa fa-gear fa-fw"></i> Hardware</a>
+                </li>
+                <li>
+                    <a href="editarAdmin.html"><i class="fa fa-wrench fa-fw"></i> Settings</a>
+                </li>
+                <li>
+                    <a href="/logout.cgi"><i class="fa fa-sign-out fa-fw"></i> Log out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </nav>
+     <div id="page-wrapper">
+         <br>
+         <div class="row">
+            <div class="col-xs-4 col-xs-offset-4">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form id="testform" action="" method="post">
+                            <fieldset>
+                                <div class="panel-body">
+                                    <input id="nom_cli" class="form-control" placeholder="username" required name="nom_cli" type="text" value="" autofocus>
+                                </div>
+                                <div class="panel-body">
+                                    <input id="passw" class="form-control" placeholder="password" required name="passw" type="text" value="" autofocus>
+                                </div>
+                                <div class="panel-body">
+                                    Type: 
+                                    <select id="type" class="pull-right" name="type">
+                                        <option value="1">Admin</option>
+                                        <option value="2" selected>Client</option>
+                                    </select>
+                                </div>
+                                <div class="panel-body">
+                                    Status: 
+                                    <select id="status" class="pull-right" name="status">
+                                        <option value="0">disabled</option>
+                                        <option value="1" selected>enabled</option>
+                                    </select>
+                                </div>
+                            </fieldset>
+                        </form>
+                        <br>
+                        <button id="enviar" class="btn btn-lg btn-success btn-block" name="enviar">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         <h4 align="center" id="msg"></h4>
+    </div>
+</div>
+    <script type="text/javascript">
+    $(document).ready(function(){
+    	$("#enviar").click(function(){
+    		$.post("/nuevoCliente.cgi", $("#testform").serialize(), function(data, status) {
+    			$("#msg").html("Data sent successfully");
+    			$("#nom_cli").val("");
+    			$("#passw").val("");
+    			$("#type").val(0);
+    			$("#status").val(1);
+	        });
+    	});
+    });
+    </script>
+</body> 
+</html>

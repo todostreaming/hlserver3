@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script type='text/javascript' src='http://www.domainplayers.org/js/jwplayer.js'></script>
+<div id='container'></div>
+<script type='text/javascript'>
+$(document).ready(function(){
+    $.post("/play.cgi",  function(data, status) {
+    	$("#container").text(data);
+    }); 
+});
+</script>
+</html>
