@@ -1,6 +1,6 @@
 /*!!
 Epoch DHTML JavaScript Calendar - Version 2.0.2
-Edición española
+English Edition
 Primary JavaScript File
 (c) 2006-2007 MeanFreePath
 Free for NON-COMMERCIAL use - see website for details and updates
@@ -24,9 +24,9 @@ function Epoch(name,mode,targetelement,multiselect) {
 		self.displayMonthInitial = self.curDate.getMonth(); //the initial month to display on load (0-11)
 		self.displayYear = self.displayYearInitial;
 		self.displayMonth = self.displayMonthInitial;
-		self.minDate = new Date(2006,0,1);
-		self.maxDate = new Date(2028,11,31);
-		self.startDay = 1; // the day the week will 'start' on: 0(Sun) to 6(Sat)
+		self.minDate = new Date(2016,0,1);
+		self.maxDate = new Date(2099,11,31);
+		self.startDay = 0; // the day the week will 'start' on: 0(Sun) to 6(Sat)
 		self.showWeeks = true; //whether the week numbers will be shown
 		self.selCurMonthOnly = true; //allow user to only select dates in the currently displayed month
 	}
@@ -36,15 +36,15 @@ function Epoch(name,mode,targetelement,multiselect) {
 	* Check Date.dateFormat() for the Date object's language settings
 	*/
 	function setLang() {
-		self.daylist = new Array('Do','Lu','Ma','Mi','Ju','Vi','Sa','Do','Lu','Ma','Mi','Ju','Vi','Sa');
-		self.months_sh = new Array('Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic');
-		self.monthup_title = 'Ir al mes siguiente';
-		self.monthdn_title = 'Ir al mes anterior';
-		self.clearbtn_caption = 'Limpiar';
-		self.clearbtn_title = 'Limpiar todas las fechas seleccionadas en el calendario';
-		self.maxrange_caption = 'Este es el rango máximo';
-		self.closebtn_caption = 'Cierre';
-		self.closebtn_title = 'Cierre el calendario';
+		self.daylist = new Array('Su','Mo','Tu','We','Th','Fr','Sa','Su','Mo','Tu','We','Th','Fr','Sa');
+		self.months_sh = new Array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		self.monthup_title = 'Go to the next month';
+		self.monthdn_title = 'Go to the previous month';
+		self.clearbtn_caption = 'Clear';
+		self.clearbtn_title = 'Clears any dates selected on the calendar';
+		self.maxrange_caption = 'This is the maximum range';
+		self.closebtn_caption = 'Close';
+		self.closebtn_title = 'Close the calendar';
 	}
 	//-----------------------------------------------------------------------------
 	/**
@@ -980,11 +980,11 @@ Date.prototype.getUeDay = function () //returns the number of DAYS since the UNI
 Date.prototype.dateFormat = function(format)
 {
 	if(!format) { // the default date format to use - can be customized to the current locale
-		format = 'd/m/Y';
+		format = 'm/d/Y';
 	}
 	LZ = function(x) {return(x < 0 || x > 9 ? '' : '0') + x};
-	var MONTH_NAMES = new Array('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic');
-	var DAY_NAMES = new Array('Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Dom','Lun','Mar','Mie','Jue','Vie','Sab');
+	var MONTH_NAMES = new Array('January','February','March','April','May','June','July','August','September','October','November','December','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+	var DAY_NAMES = new Array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sun','Mon','Tue','Wed','Thu','Fri','Sat');
 	var result="";
 	var i_format=0;
 	var c="";

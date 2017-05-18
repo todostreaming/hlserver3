@@ -94,7 +94,9 @@ func root(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 					defer fr.Close()
-					go createstats(r, spl[0], id)
+					if numgo < 1000000 { // if there are more than 1M goroutines working, live stats will stop for a while
+						go createstats(r, spl[0], id)
+					}
 					w.Header().Set("Cache-Control", "no-cache")
 					w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 					w.Header().Set("Access-Control-Allow-Headers", "*")

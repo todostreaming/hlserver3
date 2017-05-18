@@ -111,6 +111,8 @@ func main() {
 	http.HandleFunc(login_cgi, login)
 	http.HandleFunc(logout_cgi, logout)
 	// all the CGIs used
+	http.HandleFunc("/nuevoCliente.cgi", nuevoCliente)
+	http.HandleFunc("/hardware.cgi", gethardware)
 	/*
 		http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
 		http.HandleFunc("/playerStatNow.cgi", playerStatNow)
@@ -367,4 +369,32 @@ func maintenance() {
 		mes_antiguo = mes_actual
 		time.Sleep(1 * time.Minute)
 	}
+}
+
+func gethardware(w http.ResponseWriter, r *http.Request) {
+	st := Hardw.Status()
+
+	var cpu, ram, cpused, ramUsed, upload, download string
+
+	cpu = fmt.Sprintf("%s (%d cores)", st.CPUName, st.CPUCores)
+	ram = fmt.Sprintf("%d MB", st.TotalMem/1024/1000)
+
+	if st.TotalMem > 0 {
+		cpused = fmt.Sprintf("%d%%", int(st.CPUusage))
+		ramUsed = fmt.Sprintf("%d%%", 100*st.UsedMem/st.TotalMem)
+		upload = fmt.Sprintf("%d Kbps", st.RXbps/1000)
+		download = fmt.Sprintf("%d Kbps", st.TXbps/1000)
+	}
+	/*
+		Quiero en la página una tabla con todos los datos expuestos y recargados automaticamente cada 10 segundos así:
+
+		"CPU: %s (%d cores)", st.CPUName, st.CPUCores
+		"RAM: %d MB\n", st.TotalMem/1024/1000
+		"CPU used: %d%%", int(st.CPUusage)
+		"RAM used: %2d%%", 100*st.UsedMem/st.TotalMem   (importante revisar que st.TotalMem > 0, o puede dar un panic por dividir por cero)
+		"Upload: %d Mbps", st.RXbps/1000000
+		"Download: %d Mbps", st.TXbps/1000000
+	*/
+
+	fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s", cpu, ram, cpused, ramUsed, upload, download)
 }
