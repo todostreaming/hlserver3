@@ -16,8 +16,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 	pass := r.FormValue(name_password)
 
 	var username, password string
-	var tipo, status int
-	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db") // Apertura de la dateDayly.db antigua para lectura del pico/hora
+	var id, tipo, status int
+	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
 	if err != nil {
 		Error.Println(err)
 		// go back to the login form page
@@ -26,7 +26,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	defer dbgeneral.Close()
 	dbgen_mu.RLock()
-	err = dbgeneral.QueryRow("SELECT username, password, type, status FROM users WHERE username = ? AND password = ?", user, pass).Scan(&username, &password, &tipo, &status)
+	err = dbgeneral.QueryRow("SELECT id, username, password, type, status FROM users WHERE username = ? AND password = ?", user, pass).Scan(&id, &username, &password, &tipo, &status)
 	dbgen_mu.RUnlock()
 	if err != nil {
 		Error.Println(err)
@@ -44,6 +44,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 		if tipo < 3 { // superadmin or admin user
 			mu_user.Lock()
+			id_[sid] = id
 			user_[sid] = username
 			time_[sid] = expiration
 			type_[sid] = tipo
@@ -53,6 +54,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 			return
 		} else { // publisher user
 			mu_user.Lock()
+			id_[sid] = id
 			user_[sid] = username
 			time_[sid] = expiration
 			type_[sid] = tipo
@@ -78,6 +80,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		cookie.MaxAge = -1
 		http.SetCookie(w, cookie)
 		mu_user.Lock()
+		delete(id_, cookie.Value)
 		delete(user_, cookie.Value)
 		delete(time_, cookie.Value)
 		delete(type_, cookie.Value)
@@ -85,5 +88,4 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 	}
-
 }

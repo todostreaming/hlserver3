@@ -121,8 +121,7 @@
                                 <div class="panel-body">
                                     Type: 
                                     <select id="type" class="pull-right" name="type">
-                                        <option value="1">Admin</option>
-                                        <option value="2" selected>Client</option>
+										<span id="options"></span>
                                     </select>
                                 </div>
                                 <div class="panel-body">
@@ -145,13 +144,25 @@
 </div>
     <script type="text/javascript">
     $(document).ready(function(){
+		$.get("/types.cgi", function(data, status) {
+			$("#options").html(data);
+		});
     	$("#enviar").click(function(){
     		$.post("/nuevoCliente.cgi", $("#testform").serialize(), function(data, status) {
-    			$("#msg").html("Data sent successfully");
     			$("#nom_cli").val("");
     			$("#passw").val("");
-    			$("#type").val(0);
     			$("#status").val(1);
+				switch (data){
+					case "OK":
+						$("#msg").html("Data sent successfully");
+						break;
+					case "DUP":
+						$("#msg").html("Username already exists");
+						break;
+					case "BAD":
+						$("#msg").html("Database Error");
+						break;
+				}
 	        });
     	});
     });

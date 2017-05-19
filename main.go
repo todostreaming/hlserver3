@@ -113,6 +113,7 @@ func main() {
 	// all the CGIs used
 	http.HandleFunc("/nuevoCliente.cgi", nuevoCliente)
 	http.HandleFunc("/hardware.cgi", gethardware)
+	http.HandleFunc("/types.cgi", types)
 	/*
 		http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
 		http.HandleFunc("/playerStatNow.cgi", playerStatNow)

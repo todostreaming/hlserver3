@@ -145,10 +145,10 @@ func root(w http.ResponseWriter, r *http.Request) {
 	} else if strings.Contains(path, "/forecaster.js") {
 		// this code will send the javascript code for the forecaster mechanism of pre-caching
 		// http://hlserver/rawstream/forecaster.js (path = rawstream/forecaster.js)
-		tr := strings.Split(path, "/")                                                                    // rawstream = tr[0]
-		jscode := fmt.Sprintf("$.ajax({ url : \"/live/%s.lst\", method : 'HEAD', async: true });", tr[0]) // the JS code is not complete, needs to reload every 10 seconds
+		tr := strings.Split(path, "/")                                                     // rawstream = tr[0]
+		jscode := fmt.Sprintf("$.ajax({ url : \"/live/%s.lst\", type : 'HEAD' });", tr[0]) // the JS code is not complete, needs to reload every 10 seconds
 		w.Header().Set("Cache-Control", "no-cache")
-		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set("Content-Type", "text/javascript; charset=UTF-8")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.Header().Set("Access-Control-Expose-Headers", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")

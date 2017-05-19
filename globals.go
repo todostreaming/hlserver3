@@ -36,7 +36,8 @@ var (
 	Referer *syncmap.Map
 	// forecasters map ( ["near_proxy=rawstream"] = UNIXtimestamp_int64 )
 	Forecaster *syncmap.Map
-	// internal session maps (username, timestamp, type of user)
+	// internal session maps (id, username, timestamp, type of user)
+	id_     map[string]int       = make(map[string]int)
 	user_   map[string]string    = make(map[string]string)
 	time_   map[string]time.Time = make(map[string]time.Time)
 	type_   map[string]int       = make(map[string]int)
