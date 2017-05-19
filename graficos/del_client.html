@@ -133,7 +133,11 @@
        });
    	$("#borrar").click(function(){
    		$.post("/borrarCliente.cgi", $("#testform").serialize(), function(data, status) {
-   			location.reload();
+   			// escribimos un mensaje de si fue bien on no le borrado
+   			setTimeout(clearall,2000);
+   			function clearall(){
+   				location.reload();
+   			}
         });
    	});
    });

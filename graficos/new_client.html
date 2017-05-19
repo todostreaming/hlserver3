@@ -121,7 +121,6 @@
                                 <div class="panel-body">
                                     Type: 
                                     <select id="type" class="pull-right" name="type">
-										<span id="options"></span>
                                     </select>
                                 </div>
                                 <div class="panel-body">
@@ -145,7 +144,7 @@
     <script type="text/javascript">
     $(document).ready(function(){
 		$.get("/types.cgi", function(data, status) {
-			$("#options").html(data);
+			$("#type").html(data);
 		});
     	$("#enviar").click(function(){
     		$.post("/nuevoCliente.cgi", $("#testform").serialize(), function(data, status) {

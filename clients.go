@@ -18,9 +18,9 @@ func nuevoCliente(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	key := cookie.Value
-	mu_user.Lock()
+	mu_user.RLock()
 	id, ok := id_[key] // De aquí podemos recoger el id del usuario logeado
-	mu_user.Unlock()
+	mu_user.RUnlock()
 	if !ok {
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 		return
@@ -100,30 +100,117 @@ func types(w http.ResponseWriter, r *http.Request) {
 
 // Función que selecciona los clientes de la tabla admin
 func buscarClientes(w http.ResponseWriter, r *http.Request) {
-	var id int
+
+	// --- we must identify the session user 1st ------------------------
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	key := cookie.Value
+	mu_user.RLock()
+	tipo, ok := type_[key]
+	mu_user.RUnlock()
+	if !ok {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	mu_user.RLock()
+	id := type_[key]
+	//user := user_[key]
+	mu_user.RUnlock()
+	// ---- end of session identification -------------------------------
+
+	var idn int
 	var nombre, selector string
-	query, err := dblive.Query("SELECT id, username FROM admin WHERE type = 0")
+	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
 	if err != nil {
 		Error.Println(err)
+		fmt.Fprintf(w, "%s", selector)
+		return
+	}
+	defer dbgeneral.Close()
+	dbgen_mu.RLock()
+	query, err := dblive.Query("SELECT id, username FROM users WHERE type = ? AND id_recruiter = ?", tipo+1, id)
+	dbgen_mu.RUnlock()
+	if err != nil {
+		Error.Println(err)
+		fmt.Fprintf(w, "%s", selector)
+		return
 	}
 	for query.Next() {
-		err = query.Scan(&id, &nombre)
+		err = query.Scan(&idn, &nombre)
 		if err != nil {
 			Warning.Println(err)
+			fmt.Fprintf(w, "%s", selector)
+			return
 		}
-		selector = fmt.Sprintf("<option value='%d'>%s</option>", id, nombre)
-		fmt.Fprintf(w, "%s", selector)
+		selector = selector + fmt.Sprintf("<option value='%d'>%s</option>", idn, nombre)
 	}
 	query.Close()
+	fmt.Fprintf(w, "%s", selector)
 }
 
 // Función que borra un cliente de la tabla admin
 func borrarCliente(w http.ResponseWriter, r *http.Request) {
+
+	// --- we must identify the session user 1st ------------------------
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	key := cookie.Value
+	mu_user.RLock()
+	tipo, ok := type_[key] // De aquí podemos recoger el id del usuario logeado
+	mu_user.RUnlock()
+	if !ok {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	//mu_user.RLock()
+	//tipo := type_[key]
+	//user := user_[key]
+	//mu_user.RUnlock()
+	// ---- end of session identification -------------------------------
+
 	r.ParseForm()
-	mu_dblive.Lock()
-	_, err1 := dblive.Exec("DELETE FROM admin WHERE id = ?", r.FormValue("clients"))
-	mu_dblive.Unlock()
-	if err1 != nil {
-		Error.Println(err1)
+
+	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
+	if err != nil {
+		Error.Println(err)
+		return
+	}
+	defer dbgeneral.Close()
+
+	// debemos revisar si quien queremos borrar tiene usuarios a su vez (excepto si es un distro que borra directamente al publisher)
+	if tipo == 2 { // distro
+		dbgen_mu.Lock()
+		_, err = dbgeneral.Exec("DELETE FROM users WHERE id = ?", r.FormValue("clients"))
+		dbgen_mu.Unlock()
+		if err != nil {
+			Error.Println(err)
+			return
+		}
+	} else { // admin o superadmin
+		var count int
+		dbgen_mu.RLock()
+		err = dbgeneral.QueryRow("SELECT count(id) FROM users WHERE id_recruiter = ?", r.FormValue("clients")).Scan(&count)
+		dbgen_mu.RUnlock()
+		if err != nil {
+			Error.Println(err)
+			return
+		}
+		if count > 0 { // tiene clientes dependientes (no borrar)
+			// do nothing
+		} else { // no tiene clientes, se le borra
+			dbgen_mu.Lock()
+			_, err = dbgeneral.Exec("DELETE FROM users WHERE id = ?", r.FormValue("clients"))
+			dbgen_mu.Unlock()
+			if err != nil {
+				Error.Println(err)
+				return
+			}
+		}
 	}
 }
