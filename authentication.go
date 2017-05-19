@@ -42,7 +42,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		cookie := http.Cookie{Name: CookieName, Value: sid, Expires: expiration}
 		http.SetCookie(w, &cookie)
 
-		if tipo < 2 { // superadmin or admin user
+		if tipo < 3 { // superadmin or admin user
 			mu_user.Lock()
 			user_[sid] = username
 			time_[sid] = expiration

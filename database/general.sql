@@ -11,7 +11,7 @@ BEGIN TRANSACTION;
 -- username		= 1st part in every stream published or admin name
 -- password		= panel password to enter (admins and publishers)
 -- pubpass		= password for every stream publishing
--- type			= type of user (superadmin=0, admin=1, publisher=2)
+-- type			= type of user (superadmin=0, admin=1, distro=2, publisher=3)
 -- status		= enabled(1)/disabled(0) publisher (never deleted)
 -- id_recruiter = id users w/ higher type that created this account
 -- -----------------------------------------------------------------
