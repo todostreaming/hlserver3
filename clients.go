@@ -174,11 +174,13 @@ func borrarCliente(w http.ResponseWriter, r *http.Request) {
 	//mu_user.RUnlock()
 	// ---- end of session identification -------------------------------
 
+	resp := "BAD"
 	r.ParseForm()
 
 	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
 	if err != nil {
 		Error.Println(err)
+		fmt.Fprintf(w, "%s", resp)
 		return
 	}
 	defer dbgeneral.Close()
@@ -190,8 +192,10 @@ func borrarCliente(w http.ResponseWriter, r *http.Request) {
 		dbgen_mu.Unlock()
 		if err != nil {
 			Error.Println(err)
+			fmt.Fprintf(w, "%s", resp)
 			return
 		}
+		resp = "OK"
 	} else { // admin o superadmin
 		var count int
 		dbgen_mu.RLock()
@@ -199,18 +203,23 @@ func borrarCliente(w http.ResponseWriter, r *http.Request) {
 		dbgen_mu.RUnlock()
 		if err != nil {
 			Error.Println(err)
+			fmt.Fprintf(w, "%s", resp)
 			return
 		}
 		if count > 0 { // tiene clientes dependientes (no borrar)
 			// do nothing
+			resp = "DUP"
 		} else { // no tiene clientes, se le borra
 			dbgen_mu.Lock()
 			_, err = dbgeneral.Exec("DELETE FROM users WHERE id = ?", r.FormValue("clients"))
 			dbgen_mu.Unlock()
 			if err != nil {
 				Error.Println(err)
+				fmt.Fprintf(w, "%s", resp)
 				return
 			}
+			resp = "OK"
 		}
 	}
+	fmt.Fprintf(w, "%s", resp)
 }

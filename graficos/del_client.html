@@ -124,6 +124,7 @@
              </div>
          </div>
      </div>
+  	<h4 align="center" id="msg"></h4>
   </div>
 </div>
 <script type="text/javascript">
@@ -133,8 +134,19 @@
        });
    	$("#borrar").click(function(){
    		$.post("/borrarCliente.cgi", $("#testform").serialize(), function(data, status) {
-   			// escribimos un mensaje de si fue bien on no le borrado
-   			setTimeout(clearall,2000);
+   			// write a message displaying what happened
+			switch (data){
+			case "OK":
+				$("#msg").html("User successfully deleted. Please wait...");
+				break;
+			case "DUP":
+				$("#msg").html("User has clients on it (not deleted). Please wait...");
+				break;
+			case "BAD":
+				$("#msg").html("Database Error. Please wait...");
+				break;
+			}
+   			setTimeout(clearall,2000); // wait 2 seconds before cleaning the message
    			function clearall(){
    				location.reload();
    			}
