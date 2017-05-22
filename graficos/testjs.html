@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+	<h2>Header:</h2>
+	<p id="header"></p>
+	<h2>Text:</h2>
+	<p id="text"></p>
+	<h2>Status:</h2>
+	<p id="status"></p>
+	<h2>Latest Segment:</h2>
+	<p id="latest"></p>
+	<h2>TS Header:</h2>
+	<p id="tshead"></p>
+
+</body>
+<script>
+	load();
+	setInterval(load,10000); // every 10 secs  
+	function load(){
+		// all the info here: https://www.w3schools.com/js/js_ajax_http.asp
+		var xhttp = new XMLHttpRequest(); // GET request
+		xhttp.onreadystatechange = function() {
+		    if (this.readyState == 4 && this.status == 200) {
+			      document.getElementById("header").innerHTML = this.getResponseHeader("Content-Type");
+			      document.getElementById("text").innerHTML = this.responseText;
+			      document.getElementById("status").innerHTML = this.status;
+			      var arr = this.responseText.split("\n");
+			      document.getElementById("latest").innerHTML = arr[arr.length - 2];
+			      //now lets make the HEAD request
+			      var xhttp2 = new XMLHttpRequest(); // HEAD request after
+			      xhttp2.onreadystatechange = function() {
+			    	  if (this.readyState == 4 && this.status == 200) {
+			    		  document.getElementById("tshead").innerHTML = this.getAllResponseHeaders();
+			    	  }
+			      }
+			      xhttp2.open("HEAD", "http://mydomain/live/" + arr[arr.length - 2], true);
+			      xhttp2.send();
+		    }
+		};
+		xhttp.open("GET", "http://mydomain/live/luztv-livestream.m3u8", true);
+		xhttp.send();
+	}
+</script>
+</html>
