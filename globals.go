@@ -46,5 +46,5 @@ var (
 	userAgent = map[string]string{"win": "Windows", "mac": "Mac OS X", "and": "Android", "lin": "Linux"}
 	// settings.reg file
 	cloud    map[string]string = make(map[string]string)
-	mu_cloud sync.Mutex
+	mu_cloud sync.RWMutex
 )

@@ -142,11 +142,33 @@ func root(w http.ResponseWriter, r *http.Request) {
 			io.Copy(w, fr)
 			return
 		}
-	} else if strings.Contains(path, "/forecaster.js") {
+	} else if strings.Contains(path, "-precache.js") {
 		// this code will send the javascript code for the forecaster mechanism of pre-caching
-		// http://hlserver/rawstream/forecaster.js (path = rawstream/forecaster.js)
-		tr := strings.Split(path, "/")                                                     // rawstream = tr[0]
-		jscode := fmt.Sprintf("$.ajax({ url : \"/live/%s.lst\", type : 'HEAD' });", tr[0]) // the JS code is not complete, needs to reload every 10 seconds
+		// http://hlserver/rawstream-precache.js (path = rawstream-precache.js)
+		file := rootdir + path
+		_, err := os.Stat(file)
+		if err != nil { // does not exist the path (file nor dir)
+			http.NotFound(w, r)
+			return
+		}
+		fr, err := os.Open(file)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			return
+		}
+		defer fr.Close()
+		buf, err := ioutil.ReadAll(fr)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			return
+		}
+		jscode := string(buf)
+		mu_cloud.RLock()
+		domain := cloud["cloudserver"]
+		mu_cloud.RUnlock()
+		rawstream := strings.Replace(path, "-precache.js", "", -1)
+		jscode = strings.Replace(jscode, "mydomain", domain, -1)
+		jscode = strings.Replace(jscode, "rawstream", rawstream, -1)
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Content-Type", "text/javascript; charset=UTF-8")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -157,7 +179,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Accept-Ranges", "bytes")
 		fmt.Fprintf(w, "%s", jscode)
 	} else if strings.Contains(path, ".lst") { // latest segment to pre-cache (forecaster map)
-		// http://hlserver3/live/luztv-livestream.lst
+		// http://hlserver3/rawstream.lst
 		// tail -1 /var/segments/new/luztv-livestream.m3u8
 		preload := false
 		tr := strings.Split(path, "/")
