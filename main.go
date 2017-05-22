@@ -289,6 +289,8 @@ func maintenance() {
 				mu_dblive.Lock()
 				dblive.Exec("DELETE FROM players WHERE timestamp < ?", limit_time)
 				mu_dblive.Unlock()
+				// clean old proxys
+				Forecaster.Range(clean)
 				// Se seleccionan el total de Ips, las horas totales y el total de Gigabytes
 				query, err := dblive.Query("SELECT count(id), sum(total_time)/3600, sum(kilobytes)/1000000, username, streamname FROM players GROUP BY username, streamname")
 				if err != nil {

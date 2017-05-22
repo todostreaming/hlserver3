@@ -126,3 +126,18 @@ func loadSettings(filename string) {
 		}
 	}
 }
+
+// clean old registers of more than 1 day
+func clean(key, val interface{}) bool { // ["near_proxy=rawstream"] = UNIXtimestamp_int64
+	var k string
+	var v int
+
+	k = key.(string)
+	v = val.(int)
+	limit_time := time.Now().Unix() - 86400
+	if int64(v) < limit_time {
+		Forecaster.Delete(k)
+	}
+
+	return true
+}
