@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"net/http"
+	"time"
 )
 
 // Funcion para dar de alta clientes
@@ -29,6 +30,13 @@ func nuevoCliente(w http.ResponseWriter, r *http.Request) {
 	//tipo := type_[key]
 	//user := user_[key]
 	//mu_user.RUnlock()
+	// actualizamos la cookie actual
+	expiration := time.Now().Add(time.Duration(session_timeout) * time.Second)
+	newcookie := http.Cookie{Name: CookieName, Value: key, Expires: expiration}
+	http.SetCookie(w, &newcookie)
+	mu_user.Lock()
+	time_[key] = expiration
+	mu_user.Unlock()
 	// ---- end of session identification -------------------------------
 
 	resp := "BAD"
@@ -119,6 +127,13 @@ func buscarClientes(w http.ResponseWriter, r *http.Request) {
 	id := type_[key]
 	//user := user_[key]
 	mu_user.RUnlock()
+	// actualizamos la cookie actual
+	expiration := time.Now().Add(time.Duration(session_timeout) * time.Second)
+	newcookie := http.Cookie{Name: CookieName, Value: key, Expires: expiration}
+	http.SetCookie(w, &newcookie)
+	mu_user.Lock()
+	time_[key] = expiration
+	mu_user.Unlock()
 	// ---- end of session identification -------------------------------
 
 	var idn int
@@ -172,6 +187,13 @@ func borrarCliente(w http.ResponseWriter, r *http.Request) {
 	//tipo := type_[key]
 	//user := user_[key]
 	//mu_user.RUnlock()
+	// actualizamos la cookie actual
+	expiration := time.Now().Add(time.Duration(session_timeout) * time.Second)
+	newcookie := http.Cookie{Name: CookieName, Value: key, Expires: expiration}
+	http.SetCookie(w, &newcookie)
+	mu_user.Lock()
+	time_[key] = expiration
+	mu_user.Unlock()
 	// ---- end of session identification -------------------------------
 
 	resp := "BAD"
