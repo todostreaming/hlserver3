@@ -122,6 +122,7 @@ func main() {
 	http.HandleFunc("/buscarClientes.cgi", buscarClientes)
 	http.HandleFunc("/hardware.cgi", gethardware)
 	http.HandleFunc("/editar_admin.cgi", editar_admin)
+	http.HandleFunc("/editar_cliente.cgi", editar_cliente)
 	/*
 		http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
 		http.HandleFunc("/playerStatNow.cgi", playerStatNow)
