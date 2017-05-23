@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html> 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,45 +7,33 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-            
-
+    <script src="dist/Chart.bundle.js"></script>        
     <title>Streaming Control Panel</title>
-
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
     <!-- MetisMenu CSS -->
     <link href="css/metisMenu.min.css" rel="stylesheet">
-
     <!-- DataTables CSS -->
     <link href="css/dataTables.bootstrap.css" rel="stylesheet">
-
     <!-- DataTables Responsive CSS -->
     <link href="css/responsive.dataTables.scss" rel="stylesheet">
-
     <!-- Custom CSS -->
     <link href="css/sb-admin-2.css" rel="stylesheet">
-
     <!-- Custom Fonts -->
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    
     <!-- jQuery -->
     <script src="js/jquery.min.js"></script>
-
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
-
     <!-- Metis Menu Plugin JavaScript -->
     <script src="js/metisMenu.min.js"></script>
-
     <!-- DataTables JavaScript -->
     <script src="js/jquery.dataTables.min.js"></script>
     <script src="js/dataTables.bootstrap.min.js"></script>
-
     <!-- Custom Theme JavaScript -->
     <script src="js/sb-admin-2.js"></script>
 </head>
-<body>
+ <body>
 <div id="wrapper">
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
@@ -86,7 +74,7 @@
                                 <a href="dayly.html">Dayly</a>
                             </li>
                             <li>
-                                <a href="mensual.html">Montly</a>
+                                <a href="mensual.html">Monthly</a>
                             </li>
                         </ul>
                     </li>
@@ -101,49 +89,62 @@
                             </li>
 	                </li>
                     <li>
-                    <li>
                         <a href="/logout.cgi"><i class="fa fa-sign-out fa-fw"></i> Log out</a>
                     </li>
                 </ul>
              </div>
-        </div>
+         </div>
     </nav>
-    <div id="page-wrapper">
-            <br><div class="row">
-            <div align="center">
-                <div id="encoders" class="col-md-6 col-md-offset-3"></div>
-                <div id="players"  class="col-md-12 "></div>
+    <div id="page-wrapper" align="center">
+        <div class="row">
+            <div class="col-lg-3 col-lg-offset-4">
+                <h1 class="page-header">Publish Password</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-lg-offset-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Change the publish password
+                    </div>
+                <div class="panel-body">
+                    <form id="testform" action="">
+                        <fieldset>
+                            <div class="form-group" id="user"></div>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="password" required name="password" type="password">
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="repeat password" required name="repeat-password" type="password">
+                            </div>
+                            <div class="form-group" id="stat">
+                            </div>      
+                        </fieldset>
+                    </form>
+                    <button id="enviar" class="btn btn-lg btn-success btn-block" name="enviar">Change</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-<script type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function(){
-            $.post("/encoderStatNow.cgi", function(data, status) {
-                $("#encoders").html(data);
+        	user();
+        	$("#enviar").click(function(){
+    			$.post("/editar_publish.cgi", $("#testform").serialize(), function(data, status) {
+    				$("#stat").html(data);
+    				$("#password").val("");
+    				$("#repeat-password").val("");
+    	        });
             });
-            $.post("/playerStatNow.cgi", function(data, status) {
-                $("#players").html(data);
-            });
-            setInterval("delayedPost()", 10000);
         });
-        function delayedPost() {
-            $.post("/encoderStatNow.cgi", function(data, status) {
-                $("#encoders").html(data);
-            });
-            $.post("/playerStatNow.cgi", function(data, status) {
-                $("#players").html(data);
-            });
-        }
-        function launch(newURL, newName, newFeatures, orgName) {
-          var remote = open(newURL, newName, newFeatures);
-          if (remote.opener == null) remote.opener = window;
-          remote.opener.name = orgName;
-          return remote;
-        }
-        function launchRemote(url) {
-          myRemote = launch(url, "playtv", "height=429,width=620,channelmode=0,dependent=0,directories=0,fullscreen=0,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0", "myWindow");
-        }
-</script>
-</body>
+    	//Función que refresca los datos de la tabla
+    	function user(){
+        	$.post("/user_admin.cgi",  function(data, status) {
+        		$("#user").html(data);
+    		});
+    	}
+    </script>
+</body> 
 </html>

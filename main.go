@@ -123,6 +123,8 @@ func main() {
 	http.HandleFunc("/hardware.cgi", gethardware)
 	http.HandleFunc("/editar_admin.cgi", editar_admin)
 	http.HandleFunc("/editar_cliente.cgi", editar_cliente)
+	http.HandleFunc("/editar_publish.cgi", editar_publish)
+	http.HandleFunc("/user_admin.cgi", user_admin)
 	/*
 		http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
 		http.HandleFunc("/playerStatNow.cgi", playerStatNow)
@@ -139,7 +141,6 @@ func main() {
 		http.HandleFunc("/publish.cgi", publish)
 		http.HandleFunc("/onplay.cgi", onplay)
 		http.HandleFunc("/editar_cliente.cgi", editar_cliente)
-		http.HandleFunc("/user_admin.cgi", user_admin)
 		http.HandleFunc("/totalMonths.cgi", totalMonths)
 		http.HandleFunc("/totalMonthsChange.cgi", totalMonthsChange)
 	*/
