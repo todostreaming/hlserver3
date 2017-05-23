@@ -145,7 +145,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	} else if strings.Contains(path, "-precache.js") {
 		// this code will send the javascript code for the forecaster mechanism of pre-caching
 		// http://hlserver/rawstream-precache.js (path = rawstream-precache.js)
-		file := rootdir + path
+		file := rootdir + "precache.js"
 		_, err := os.Stat(file)
 		if err != nil { // does not exist the path (file nor dir)
 			http.NotFound(w, r)
