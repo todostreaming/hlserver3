@@ -1,4 +1,3 @@
-// ab -r -n 100000 -c 200 -l "http://127.0.0.1:9999/geoip.cgi"
 package main
 
 import (
@@ -323,7 +322,7 @@ func maintenance() {
 					hourMin := fmt.Sprintf("%02d:%02d", horapico, minpico) //hour:min para monthly.db
 					dbmon_mu.Lock()
 					// Inserto los datos de resumen mensual
-					_, err1 := db2.Exec("INSERT INTO resumen (`username`,`streamname`, `players`, `minutes`, `peak`, `peaktime`, `gigabytes`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+					_, err1 := db2.Exec("INSERT INTO resumen (`username`,`streamname`, `players`, `hours`, `peak`, `peaktime`, `gigabytes`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 						userName, streamName, ips, horas, pico, hourMin, gigas, fechaMonth)
 					dbmon_mu.Unlock()
 					if err1 != nil {

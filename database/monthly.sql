@@ -11,7 +11,7 @@ BEGIN TRANSACTION;
 -- username		= 1st part in stream
 -- streamname	= 2nd part in stream
 -- players		= total players connected in the day
--- minutes		= total minutes played today
+-- hours		= total of hours played today
 -- peak			= maximum number of players today
 -- peaktime		= hh:mm when peak reached
 -- gigabytes	= total GBs consumed in the day
@@ -22,7 +22,7 @@ CREATE TABLE "resumen" (
 "username"  TEXT(255),
 "streamname"  TEXT(255),
 "players"  INTEGER,
-"minutes"  INTEGER,
+"hours"  INTEGER,
 "peak"  INTEGER,
 "peaktime"  TEXT(10),
 "gigabytes"  INTEGER,

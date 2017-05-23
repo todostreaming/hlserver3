@@ -47,4 +47,6 @@ var (
 	// settings.reg file
 	cloud    map[string]string = make(map[string]string)
 	mu_cloud sync.RWMutex
+	// year months
+	YearMonths = []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 )

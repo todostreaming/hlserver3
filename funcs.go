@@ -141,3 +141,16 @@ func clean(key, val interface{}) bool { // ["near_proxy=rawstream"] = UNIXtimest
 
 	return true
 }
+
+// devuelve array con 2 años arriba y abajo del actual
+func UpDownYears(year int) []int {
+	years := []int{}
+
+	years = append(years, year-2)
+	years = append(years, year-1)
+	years = append(years, year)
+	years = append(years, year+1)
+	years = append(years, year+2)
+
+	return years
+}

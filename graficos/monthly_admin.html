@@ -123,10 +123,12 @@
                             <tr>
                                 <th style="text-align:center">MONTH</th>
                                 <th style="text-align:center">YEAR</th>
+                                <th style="text-align:center">TYPE</th>
                             </tr>
                             <tr>
                                 <td align="center"><select id="months" name="months"></select></td>
                                 <td align="center"><select id="years"  name="years" ></select></td>
+                                <td align="center"><select id="types"  name="types" ></select></td>
                             </tr>
                             </table>
                         </form>
@@ -155,14 +157,14 @@
             var res = data.trim().split(";");
             $("#months").html(res[0]);
             $("#years").html(res[1]);
-            $("#msg").html(res[2]);
+            $("#types").html(res[2]);
         });
         //MUESTRA LOS DATOS EN LA PRIMERA RECARGA
         $.post("/putMonthlyAdmin.cgi", $("#testform").serialize(), function(data, status) {
             $("#campos").html(data); 
         });
         //MUESTRA LOS DATOS DE LOS SELECTS
-        $("#months, #years, #stream").change(function(){
+        $("#months, #years, #types").change(function(){
             $.post("/putMonthlyAdminChange.cgi", $("#testform").serialize(), function(data, status) {
             	if (data == "NoBD"){
             		$("#campos").html("");

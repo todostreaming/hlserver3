@@ -187,15 +187,15 @@ func root(w http.ResponseWriter, r *http.Request) {
 		ip := getip(r.RemoteAddr)                // take near_proxy ip or r.Header["X-Cdn-Pop"] = [gsw] ???
 		key := ip + "=" + spl[0]
 		val, ok := Forecaster.Load(key)
+		t := time.Now().Unix()
 		if ok {
-			t := time.Now().Unix()
-			if t-val.(int64) >= 5 { // if more than 5 secs
+			if t-val.(int64) >= 4 { // 4 secs
 				preload = true
-				Forecaster.Store(key, time.Now().Unix())
+				Forecaster.Store(key, t)
 			}
 		} else {
 			preload = true
-			Forecaster.Store(key, time.Now().Unix())
+			Forecaster.Store(key, t)
 		}
 		if preload {
 			resp = getlatestseg(spl[0])
