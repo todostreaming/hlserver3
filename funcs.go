@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"math/rand"
@@ -164,4 +165,14 @@ func daysIn(m time.Month, year int) int {
 func daysStringIn(mes string, year int) int {
 	m, _ := strconv.Atoi(mes)
 	return time.Date(year, time.Month(m+1), 0, 0, 0, 0, 0, time.UTC).Day()
+}
+
+// seconds to formated string hh:mm:ss
+func secs2time(seconds int) (time string) {
+	horas := int(seconds / 3600)
+	minutos := int((seconds - (horas * 3600)) / 60)
+	segundos := seconds - (horas * 3600) - (minutos * 60)
+	time = fmt.Sprintf("%dh:%02dm:%02ds", horas, minutos, segundos)
+
+	return
 }

@@ -134,14 +134,14 @@ func main() {
 	http.HandleFunc("/createGraf.cgi", createGraf)
 	http.HandleFunc("/firstMonthly.cgi", firstMonthly)
 	http.HandleFunc("/graficosMonthly.cgi", graficosMonthly)
+	http.HandleFunc("/consultaFecha.cgi", consultaFecha)
+	http.HandleFunc("/giveFecha.cgi", giveFecha)
+	http.HandleFunc("/zeroFields.cgi", zeroFields)
+	http.HandleFunc("/formatDaylyhtml.cgi", formatDaylyhtml)
+	http.HandleFunc("/play.cgi", play)
 	/*
 		http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
 		http.HandleFunc("/playerStatNow.cgi", playerStatNow)
-		http.HandleFunc("/consultaFecha.cgi", consultaFecha)
-		http.HandleFunc("/giveFecha.cgi", giveFecha)
-		http.HandleFunc("/zeroFields.cgi", zeroFields)
-		http.HandleFunc("/formatDaylyhtml.cgi", formatDaylyhtml)
-		http.HandleFunc("/play.cgi", play)
 	*/
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }
