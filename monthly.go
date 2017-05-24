@@ -70,7 +70,7 @@ func getMonthsYears(w http.ResponseWriter, r *http.Request) {
 			menu2 += fmt.Sprintf("<option label='%d' value='%d'>%d</option>", value, value, value)
 		}
 	}
-	menu3 = "<option label='todo' value='todo'>Todo</option>"
+	menu3 = "<option label='todo' value='todo'>All</option>"
 	fmt.Fprintf(w, "%s;%s;%s", menu1, menu2, menu3)
 }
 
@@ -110,6 +110,7 @@ func firstMonthly(w http.ResponseWriter, r *http.Request) {
 	db0, err := sql.Open("sqlite3", dirMonthlys+mesGrafico+"monthly.db")
 	if err != nil {
 		Error.Println(err)
+		return
 	}
 	//Generamos el select de streams
 	dbmon_mu.RLock()
@@ -120,22 +121,20 @@ func firstMonthly(w http.ResponseWriter, r *http.Request) {
 	}
 	if !query2.Next() {
 		//No, campos vacios
-		menu3 = "<option label='todo' value='todo' selected>Todo</option>"
+		menu3 = "<option label='All' value='todo' selected>All</option>"
 	} else {
 		//Si, existen campos. Formamos el select
-		menu3 = "<option label='todo' value='todo' selected>Todo</option>"
+		menu3 = "<option label='All' value='todo' selected>All</option>"
 		dbmon_mu.RLock()
 		query3, err := db0.Query("SELECT  DISTINCT(streamname) FROM resumen WHERE username = ?", username)
 		dbmon_mu.RUnlock()
 		if err != nil {
 			Error.Println(err)
+			return
 		}
 		for query3.Next() {
 			var stream string
-			err = query3.Scan(&stream)
-			if err != nil {
-				Warning.Println(err)
-			}
+			query3.Scan(&stream)
 			menu3 += "<option label='" + stream + "' value='" + stream + "'>" + stream + "</option>"
 		}
 		query3.Close()
@@ -146,7 +145,7 @@ func firstMonthly(w http.ResponseWriter, r *http.Request) {
 		fechaAud = append(fechaAud, i)
 	}
 	dbmon_mu.RLock()
-	query, err := db0.Query("SELECT sum(audiencia), sum(minutos), avg(minutos), sum(megabytes), max(pico), horapico, fecha FROM resumen WHERE username = ? GROUP BY fecha", username)
+	query, err := db0.Query("SELECT sum(players), sum(hours), avg(hours), sum(gigabytes), max(peak), peaktime, date FROM resumen WHERE username = ? GROUP BY date", username)
 	dbmon_mu.RUnlock()
 	if err != nil {
 		Error.Println(err)
@@ -202,11 +201,6 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 		return
 	}
-	//mu_user.RLock()
-	//tipo := type_[key]
-	//user := user_[key]
-	//mu_user.RUnlock()
-	// actualizamos la cookie actual
 	// ---- end of session identification -------------------------------
 
 	r.ParseForm() // recupera campos del form tanto GET como POST
@@ -227,10 +221,10 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 	//Se comprueba si existe la base de datos mensual
 	if _, err := os.Stat(dirMonthlys + mesGrafico + "monthly.db"); os.IsNotExist(err) {
 		//No hay base de datos
-		Warning.Println("No existe el fichero de base de datos")
+		Warning.Println("Database file does not exists")
 		Error.Println(err)
 		tipo1, _ := json.Marshal(Grafico2{"bar", arrNull, fechaAud})
-		menu3 := "<option label='todo' value='todo'>Todo</option>"
+		menu3 := "<option label='todo' value='todo'>All</option>"
 		fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s;%s", string(tipo1), string(tipo1), string(tipo1), string(tipo1), string(tipo1), string(tipo1), menu3)
 	} else {
 		if r.FormValue("stream") == "todo" {
@@ -238,6 +232,7 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 			db0, err := sql.Open("sqlite3", dirMonthlys+mesGrafico+"monthly.db")
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			//Generamos el select de streams
 			dbmon_mu.RLock()
@@ -245,44 +240,41 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 			dbmon_mu.RUnlock()
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			if !query2.Next() {
 				//No, campos vacios
-				menu3 = "<option label='todo' value='todo' selected>Todo</option>"
+				menu3 = "<option label='All' value='todo' selected>All</option>"
 			} else {
 				//Si, existen campos. Formamos el select
-				menu3 = "<option label='todo' value='todo' selected>Todo</option>"
+				menu3 = "<option label='All' value='todo' selected>All</option>"
 				dbmon_mu.RLock()
 				query3, err := db0.Query("SELECT  DISTINCT(streamname) FROM resumen WHERE username = ?", username)
 				dbmon_mu.RUnlock()
 				if err != nil {
 					Warning.Println(err)
+					return
 				}
 				for query3.Next() {
 					var stream string
-					err = query3.Scan(&stream)
-					if err != nil {
-						Warning.Println(err)
-					}
+					query3.Scan(&stream)
 					menu3 += "<option label='" + stream + "' value='" + stream + "'>" + stream + "</option>"
 				}
 				query3.Close()
 			}
 			query2.Close()
 			dbmon_mu.RLock()
-			query, err := db0.Query("SELECT sum(audiencia), sum(minutos), avg(minutos), sum(megabytes), max(pico), horapico, fecha FROM resumen WHERE username = ? GROUP BY fecha", username)
+			query, err := db0.Query("SELECT sum(players), sum(hours), avg(hours), sum(gigabytes), max(peak), peaktime, date FROM resumen WHERE username = ? GROUP BY date", username)
 			dbmon_mu.RUnlock()
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			for query.Next() {
 				var audiencia, minutos, megas, pico int
 				var promedio float64
 				var horapico, fecha string
-				err = query.Scan(&audiencia, &minutos, &promedio, &megas, &pico, &horapico, &fecha)
-				if err != nil {
-					Warning.Println(err)
-				}
+				query.Scan(&audiencia, &minutos, &promedio, &megas, &pico, &horapico, &fecha)
 				hour := strings.Split(horapico, ":")
 				day := strings.Split(fecha, ":")
 				arrAud[toInt(day[1])] = audiencia
@@ -313,22 +305,21 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 			db0, err := sql.Open("sqlite3", dirMonthlys+mesGrafico+"monthly.db")
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			dbmon_mu.RLock()
 			query2, err := db0.Query("SELECT  DISTINCT(streamname) FROM resumen WHERE username = ?", username)
 			dbmon_mu.RUnlock()
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			//Generamos el select de streams
-			menu3 := "<option label='todo' value='todo'>Todo</option>"
+			menu3 := "<option label='All' value='todo'>All</option>"
 			//Si existen campos, formamos el select
 			for query2.Next() {
 				var stream string
-				err = query2.Scan(&stream)
-				if err != nil {
-					Warning.Println(err)
-				}
+				query2.Scan(&stream)
 				if stream == r.FormValue("stream") {
 					menu3 += "<option label='" + stream + "' value='" + stream + "' selected>" + stream + "</option>"
 				} else {
@@ -337,19 +328,17 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 			}
 			query2.Close()
 			dbmon_mu.RLock()
-			query, err := db0.Query("SELECT sum(audiencia), sum(minutos), avg(minutos), sum(megabytes), max(pico), horapico, fecha FROM resumen WHERE username = ? AND streamname = ? GROUP BY fecha", username, r.FormValue("stream"))
+			query, err := db0.Query("SELECT sum(players), sum(hours), avg(hours), sum(gigabytes), max(peak), peaktime, date FROM resumen WHERE username = ? AND streamname = ? GROUP BY date", username, r.FormValue("stream"))
 			dbmon_mu.RUnlock()
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			for query.Next() {
 				var audiencia, minutos, megas, pico int
 				var promedio float64
 				var horapico, fecha string
-				err = query.Scan(&audiencia, &minutos, &promedio, &megas, &pico, &horapico, &fecha)
-				if err != nil {
-					Warning.Println(err)
-				}
+				query.Scan(&audiencia, &minutos, &promedio, &megas, &pico, &horapico, &fecha)
 				hour := strings.Split(horapico, ":")
 				day := strings.Split(fecha, ":")
 				arrAud[toInt(day[1])] = audiencia
@@ -397,11 +386,6 @@ func totalMonths(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 		return
 	}
-	//mu_user.RLock()
-	//tipo := type_[key]
-	//user := user_[key]
-	//mu_user.RUnlock()
-	// actualizamos la cookie actual
 	// ---- end of session identification -------------------------------
 
 	var minutos, megas int
@@ -413,7 +397,7 @@ func totalMonths(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db0.Close()
 	dbmon_mu.RLock()
-	query, err := db0.Query("SELECT sum(minutos), sum(megabytes) FROM resumen WHERE username = ? GROUP BY username", username)
+	query, err := db0.Query("SELECT sum(hours), sum(gigabytes) FROM resumen WHERE username = ? GROUP BY username", username)
 	dbmon_mu.RUnlock()
 	if err != nil {
 		Error.Println(err)
@@ -425,7 +409,7 @@ func totalMonths(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	query.Close()
-	table := fmt.Sprintf("<tr><th>Total de horas consumidas: </th><td>&nbsp;</td><td>%d</td></tr><tr><th>Total de GB consumidos: </th><td>&nbsp;</td><td>%d</td></tr>", minutos, megas)
+	table := fmt.Sprintf("<tr><th>Hours consumed: </th><td>&nbsp;</td><td>%d</td></tr><tr><th>GBs consumed: </th><td>&nbsp;</td><td>%d</td></tr>", minutos, megas)
 	fmt.Fprintf(w, "%s", table)
 }
 
@@ -446,10 +430,6 @@ func totalMonthsChange(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 		return
 	}
-	//mu_user.RLock()
-	//tipo := type_[key]
-	//user := user_[key]
-	//mu_user.RUnlock()
 	// actualizamos la cookie actual
 	expiration := time.Now().Add(time.Duration(session_timeout) * time.Second)
 	newcookie := http.Cookie{Name: CookieName, Value: key, Expires: expiration}
@@ -465,7 +445,7 @@ func totalMonthsChange(w http.ResponseWriter, r *http.Request) {
 	//Se comprueba si existe la base de datos mensual
 	if _, err := os.Stat(dirMonthlys + mesGrafico + "monthly.db"); os.IsNotExist(err) {
 		//No hay base de datos
-		Warning.Println("No existe el fichero de base de datos")
+		Warning.Println("Database does not exists")
 		Error.Println(err)
 		fmt.Fprintf(w, "%s", "NoBD")
 	} else {
@@ -475,7 +455,7 @@ func totalMonthsChange(w http.ResponseWriter, r *http.Request) {
 		}
 		defer db0.Close()
 		dbmon_mu.RLock()
-		query, err := db0.Query("SELECT sum(minutos), sum(megabytes) FROM resumen WHERE username = ? GROUP BY username", username)
+		query, err := db0.Query("SELECT sum(hours), sum(gigabytes) FROM resumen WHERE username = ? GROUP BY username", username)
 		dbmon_mu.RUnlock()
 		if err != nil {
 			Warning.Println(err)
@@ -487,7 +467,7 @@ func totalMonthsChange(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		query.Close()
-		table := fmt.Sprintf("<tr><th>Total de horas consumidas: </th><td>&nbsp;</td><td>%d</td></tr><tr><th>Total de GB consumidos: </th><td>&nbsp;</td><td>%d</td></tr>", minutos, megas)
+		table := fmt.Sprintf("<tr><th>Hours consumed: </th><td>&nbsp;</td><td>%d</td></tr><tr><th>GBs consumed: </th><td>&nbsp;</td><td>%d</td></tr>", minutos, megas)
 		fmt.Fprintf(w, "%s", table)
 	}
 }
@@ -511,12 +491,12 @@ func createGraf(w http.ResponseWriter, r *http.Request) {
 	}
 	// ---- end of session identification -------------------------------
 
-	canv1 := "<label>Audiencia Total por personas</label><canvas id='graficop1'/>"
-	canv2 := "<label>Tiempo Total Visionado</label><canvas id='graficop2'/>"
-	canv3 := "<label>Tiempo Medio visionado en horas</label><canvas id='graficop3'/>"
-	canv4 := "<label>Tráfico diario en GigaBytes</label><canvas id='graficop4'/>"
-	canv5 := "<label>Máximo simultaneos en personas</label><canvas id='graficop5'/>"
-	canv6 := "<label>Hora Pico de Audiencia</label><canvas id='graficop6'/>"
+	canv1 := "<label>Audience in Players</label><canvas id='graficop1'/>"
+	canv2 := "<label>Hours of Playback</label><canvas id='graficop2'/>"
+	canv3 := "<label>Average Time of Playback in hours</label><canvas id='graficop3'/>"
+	canv4 := "<label>Traffic in Gigabytes</label><canvas id='graficop4'/>"
+	canv5 := "<label>Max Audience in Players</label><canvas id='graficop5'/>"
+	canv6 := "<label>Peak Times</label><canvas id='graficop6'/>"
 	fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s", canv1, canv2, canv3, canv4, canv5, canv6)
 }
 
