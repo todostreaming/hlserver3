@@ -33,10 +33,6 @@ func giveFecha(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 		return
 	}
-	//mu_user.RLock()
-	//tipo := type_[key]
-	//user := user_[key]
-	//mu_user.RUnlock()
 	// actualizamos la cookie actual
 	expiration := time.Now().Add(time.Duration(session_timeout) * time.Second)
 	newcookie := http.Cookie{Name: CookieName, Value: key, Expires: expiration}
@@ -121,25 +117,25 @@ func firstFecha(w http.ResponseWriter, r *http.Request) {
 	//Fecha actual
 	fecha_actual := fmt.Sprintf("%02d-%02d-%02d", anio, mes, dia) // Fecha actual
 	fecha_ESP := fmt.Sprintf("%02d/%02d/%02d", dia, mes, anio)    // Fecha a mostrar en el html
-	fecha_ESP = "Estadísticas correspondientes al día " + fecha_ESP + " de " + username
+	fecha_ESP = "Stats corresponding to date " + fecha_ESP + " of " + username
 	// La primera vez que se entra a la web, se abre el fichero de dayly.db actual
 	db_now, err := sql.Open("sqlite3", dirDaylys+fecha_actual+"dayly.db")
 	if err != nil {
 		Error.Println(err)
+		return
 	}
+	defer db_now.Close()
 	dbday_mu.RLock()
-	query, err := db_now.Query("SELECT time, os, sum(count) FROM resumen WHERE username = ? GROUP BY username, os", username)
+	query, err := db_now.Query("SELECT time, os, sum(players) FROM resumen WHERE username = ? GROUP BY username, os", username)
 	dbday_mu.RUnlock()
 	if err != nil {
 		Warning.Println(err)
+		return
 	}
 	for query.Next() {
 		var time, count int
 		var so string
-		err = query.Scan(&time, &so, &count)
-		if err != nil {
-			Warning.Println(err)
-		}
+		query.Scan(&time, &so, &count)
 		arrTime = append(arrTime, time)
 		arrSo = append(arrSo, so)
 		arrSess = append(arrSess, count)
@@ -150,47 +146,41 @@ func firstFecha(w http.ResponseWriter, r *http.Request) {
 	dbday_mu.RUnlock()
 	if err != nil {
 		Error.Println(err)
+		return
 	}
 	for query2.Next() {
 		var time int
 		var isocode string
-		err = query2.Scan(&time, &isocode)
-		if err != nil {
-			Warning.Println(err)
-		}
+		query2.Scan(&time, &isocode)
 		timePais = append(timePais, time)
 		arrIso = append(arrIso, isocode)
 	}
 	query2.Close()
 	dbday_mu.RLock()
-	query3, err := db_now.Query("SELECT sum(count), isocode FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode , os HAVING count = max(count))  GROUP BY isocode ", username)
+	query3, err := db_now.Query("SELECT sum(players), isocode FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode , os HAVING players = max(players)) GROUP BY isocode ", username)
 	dbday_mu.RUnlock()
 	if err != nil {
 		Error.Println(err)
+		return
 	}
 	for query3.Next() {
 		var count int
 		var isocode string
-		err = query3.Scan(&count, &isocode)
-		if err != nil {
-			Warning.Println(err)
-		}
+		query3.Scan(&count, &isocode)
 		sesionPais = append(sesionPais, count)
 		paisSes = append(paisSes, isocode)
 	}
 	query3.Close()
 	dbday_mu.RLock()
-	query4, err := db_now.Query("SELECT sum(count), hour FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode, hour, os HAVING count = max(count))  GROUP BY hour ORDER BY hour ASC", username)
+	query4, err := db_now.Query("SELECT sum(players), hour FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode, hour, os HAVING players = max(players)) GROUP BY hour ORDER BY hour ASC", username)
 	dbday_mu.RUnlock()
 	if err != nil {
 		Error.Println(err)
+		return
 	}
 	for query4.Next() {
 		var count, hora int
-		err = query4.Scan(&count, &hora)
-		if err != nil {
-			Warning.Println(err)
-		}
+		query4.Scan(&count, &hora)
 		sesHour = onlyHours()
 		horaSes[hora] = count
 	}
@@ -202,7 +192,6 @@ func firstFecha(w http.ResponseWriter, r *http.Request) {
 	grafico3, _ := json.Marshal(Grafico{"pie", sesionPais, paisSes, colores})    // Aquí se crea el JSON para el grafico de sesiones por pais
 	grafico4, _ := json.Marshal(Grafico2{"line", sesionHours(horaSes), sesHour}) // Aquí se crea el JSON para el grafico de sesiones por franja horaria
 	fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s", fecha_ESP, string(grafico0), string(grafico1), string(grafico2), string(grafico3), string(grafico4))
-	db_now.Close()
 }
 
 func formatDaylyhtml(w http.ResponseWriter, r *http.Request) {
@@ -223,13 +212,13 @@ func formatDaylyhtml(w http.ResponseWriter, r *http.Request) {
 	}
 	// ---- end of session identification -------------------------------
 
-	canv1 := "<h3>Sesiones por Franja Horaria</h3><canvas id='selGraf5'/>"
-	title := "<h3>Plataformas Usadas</h3>"
-	canv2 := "<label>Sesiones por Sistema Operativo</label><canvas id='selGraf2'/>"
-	canv3 := "<label>Segundos consumidos por Sistema Operativo</label><canvas id='selGraf1'/>"
-	title2 := "<h3>Datos de paises</h3>"
-	canv4 := "<label>Tiempo consumido(en Sec) por País</label><canvas id='selGraf3'/>"
-	canv5 := "<label>Sesiones por País</label><canvas id='selGraf4'/>"
+	canv1 := "<h3>Players per Hours</h3><canvas id='selGraf5'/>"
+	title := "<h3>Operating Systems</h3>"
+	canv2 := "<label>Number of Players</label><canvas id='selGraf2'/>"
+	canv3 := "<label>Seconds Playing</label><canvas id='selGraf1'/>"
+	title2 := "<h3>Countries</h3>"
+	canv4 := "<label>Seconds per Country</label><canvas id='selGraf3'/>"
+	canv5 := "<label>Players per Country</label><canvas id='selGraf4'/>"
 
 	fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s;%s", canv1, title, canv2, canv3, title2, canv4, canv5)
 }
@@ -270,40 +259,41 @@ func consultaFecha(w http.ResponseWriter, r *http.Request) {
 	//Fecha obtenida del select de dayly.html
 	fechaHTML := strings.Split(r.FormValue("fecha"), "/")
 	fechaSQL := fmt.Sprintf("%s-%s-%s", fechaHTML[2], fechaHTML[1], fechaHTML[0]) // Formato SQLite
-	fechaESP := "Estadísticas correspondientes al día " + r.FormValue("fecha")    // Fecha a mostrar en HTML
+	fechaESP := "Stats corresponding to date " + r.FormValue("fecha")             // Fecha a mostrar en HTML
 	//Al escoger una fecha, comprobamos si existe el fichero de Base de datos
 	if _, err := os.Stat(dirDaylys + fechaSQL + "dayly.db"); os.IsNotExist(err) {
-		Warning.Println("No existe el fichero de base de datos.")
+		Warning.Println("Database file does not exists.")
 		fmt.Fprintf(w, "NoBD")
 	} else {
 		//Por lo tanto, abrimos el fichero
 		db_fecha, err := sql.Open("sqlite3", dirDaylys+fechaSQL+"dayly.db")
 		if err != nil {
 			Warning.Println(err)
+			return
 		}
+		defer db_fecha.Close()
 		dbday_mu.RLock()
 		exist, err := db_fecha.Query("SELECT * FROM resumen WHERE username = ?", username)
 		dbday_mu.RUnlock()
 		if err != nil {
 			Warning.Println(err)
+			return
 		}
 		if exist.Next() == false {
-			Warning.Println("Fichero de base de datos vacío.")
+			Warning.Println("Database empty.")
 			fmt.Fprintf(w, "NoBD")
 		} else {
 			dbday_mu.RLock()
-			query, err := db_fecha.Query("SELECT time, os, sum(count) FROM resumen WHERE username = ? GROUP BY username, os", username)
+			query, err := db_fecha.Query("SELECT time, os, sum(players) FROM resumen WHERE username = ? GROUP BY username, os", username)
 			dbday_mu.RUnlock()
 			if err != nil {
 				Warning.Println(err)
+				return
 			}
 			for query.Next() {
 				var time, count int
 				var so string
-				err = query.Scan(&time, &so, &count)
-				if err != nil {
-					Warning.Println(err)
-				}
+				query.Scan(&time, &so, &count)
 				arrTime = append(arrTime, time)
 				arrSo = append(arrSo, so)
 				arrSess = append(arrSess, count)
@@ -314,48 +304,42 @@ func consultaFecha(w http.ResponseWriter, r *http.Request) {
 			dbday_mu.RUnlock()
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			for query2.Next() {
 				var time int
 				var isocode string
-				err = query2.Scan(&time, &isocode)
-				if err != nil {
-					Warning.Println(err)
-				}
+				query2.Scan(&time, &isocode)
 				timePais = append(timePais, time)
 				arrIso = append(arrIso, isocode)
 			}
 			query2.Close()
 			dbday_mu.RLock()
-			query3, err := db_fecha.Query("SELECT sum(count), isocode FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode , os HAVING count = max(count))  GROUP BY isocode", username)
+			query3, err := db_fecha.Query("SELECT sum(players), isocode FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode , os HAVING players = max(players)) GROUP BY isocode", username)
 			dbday_mu.RUnlock()
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			for query3.Next() {
 				var count int
 				var isocode string
-				err = query3.Scan(&count, &isocode)
-				if err != nil {
-					Warning.Println(err)
-				}
+				query3.Scan(&count, &isocode)
 				sesionPais = append(sesionPais, count)
 				paisSes = append(paisSes, isocode)
 			}
 			query3.Close()
 			dbday_mu.RLock()
-			query4, err := db_fecha.Query("SELECT sum(count), hour FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode, hour, os HAVING count = max(count))  GROUP BY hour ORDER BY hour ASC", username)
+			query4, err := db_fecha.Query("SELECT sum(players), hour FROM resumen WHERE username = ? AND id IN(SELECT id FROM resumen GROUP BY username, isocode, hour, os HAVING players = max(players)) GROUP BY hour ORDER BY hour ASC", username)
 			dbday_mu.RUnlock()
 			if err != nil {
 				Error.Println(err)
+				return
 			}
 			for query4.Next() {
 				var count int
 				var hora int
-				err = query4.Scan(&count, &hora)
-				if err != nil {
-					Warning.Println(err)
-				}
+				query4.Scan(&count, &hora)
 				sesHour = onlyHours()
 				horaSes[hora] = count
 			}
@@ -369,7 +353,6 @@ func consultaFecha(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s", fechaESP, string(grafico0), string(grafico1), string(grafico2), string(grafico3), string(grafico4))
 		}
 		exist.Close()
-		db_fecha.Close()
 	}
 }
 

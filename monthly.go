@@ -107,6 +107,7 @@ func firstMonthly(w http.ResponseWriter, r *http.Request) {
 		Error.Println(err)
 		return
 	}
+	defer db0.Close()
 	//Generamos el select de streams
 	dbmon_mu.RLock()
 	query2, err := db0.Query("SELECT  DISTINCT(streamname) FROM resumen WHERE username = ?", username)
@@ -177,7 +178,6 @@ func firstMonthly(w http.ResponseWriter, r *http.Request) {
 	grafico5, _ := json.Marshal(Grafico2{"bar", g5, fechaAud})  // Aquí se crea el JSON para el grafico de sesiones por franja horaria
 	grafico6, _ := json.Marshal(Grafico2{"line", g6, fechaAud}) // Aquí se crea el JSON para el grafico de sesiones por franja horaria
 	fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s;%s", string(grafico1), string(grafico2), string(grafico3), string(grafico4), string(grafico5), string(grafico6), menu3)
-	db0.Close()
 }
 
 func graficosMonthly(w http.ResponseWriter, r *http.Request) {
@@ -229,6 +229,7 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 				Error.Println(err)
 				return
 			}
+			defer db0.Close()
 			//Generamos el select de streams
 			dbmon_mu.RLock()
 			query2, err := db0.Query("SELECT  DISTINCT(streamname) FROM resumen WHERE username = ?", username)
@@ -295,13 +296,13 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 			grafico4, _ := json.Marshal(Grafico2{"bar", g5, fechaAud})  // Aquí se crea el JSON para el grafico de sesiones por franja horaria
 			grafico5, _ := json.Marshal(Grafico2{"line", g6, fechaAud}) // Aquí se crea el JSON para el grafico de sesiones por franja horaria
 			fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s;%s", string(grafico0), string(grafico1), string(grafico2), string(grafico3), string(grafico4), string(grafico5), menu3)
-			db0.Close()
 		} else {
 			db0, err := sql.Open("sqlite3", dirMonthlys+mesGrafico+"monthly.db")
 			if err != nil {
 				Error.Println(err)
 				return
 			}
+			db0.Close()
 			dbmon_mu.RLock()
 			query2, err := db0.Query("SELECT  DISTINCT(streamname) FROM resumen WHERE username = ?", username)
 			dbmon_mu.RUnlock()
@@ -359,7 +360,6 @@ func graficosMonthly(w http.ResponseWriter, r *http.Request) {
 			grafico4, _ := json.Marshal(Grafico2{"bar", g5, fechaAud})  // Aquí se crea el JSON para el grafico de sesiones por franja horaria
 			grafico5, _ := json.Marshal(Grafico2{"line", g6, fechaAud}) // Aquí se crea el JSON para el grafico de sesiones por franja horaria
 			fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s;%s", string(grafico0), string(grafico1), string(grafico2), string(grafico3), string(grafico4), string(grafico5), menu3)
-			db0.Close()
 		}
 	}
 }
