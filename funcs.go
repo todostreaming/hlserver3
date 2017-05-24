@@ -154,3 +154,14 @@ func UpDownYears(year int) []int {
 
 	return years
 }
+
+// devuelve el numero de dias de un mes y año determinados
+func daysIn(m time.Month, year int) int {
+	return time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC).Day()
+}
+
+// devuelve el numero de dias de un mes y año determinados recibiendo un string
+func daysStringIn(mes string, year int) int {
+	m, _ := strconv.Atoi(mes)
+	return time.Date(year, time.Month(m+1), 0, 0, 0, 0, 0, time.UTC).Day()
+}
