@@ -184,8 +184,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 		preload := false
 		tr := strings.Split(path, "/")
 		spl := strings.Split(tr[len(tr)-1], ".") // spl[0] = rawstream
-		ip := getip(r.RemoteAddr)                // take near_proxy ip or r.Header["X-Cdn-Pop"] = [gsw] ???
-		key := ip + "=" + spl[0]
+		pop := r.Header["X-Cdn-Pop"]             // take near_proxy ip or r.Header["X-Cdn-Pop"] = [gsw] ???
+		key := pop[0] + "=" + spl[0]
 		val, ok := Forecaster.Load(key)
 		t := time.Now().Unix()
 		if ok {
