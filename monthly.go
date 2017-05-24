@@ -90,11 +90,6 @@ func firstMonthly(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
 		return
 	}
-	//mu_user.RLock()
-	//tipo := type_[key]
-	//user := user_[key]
-	//mu_user.RUnlock()
-	// actualizamos la cookie actual
 	// ---- end of session identification -------------------------------
 
 	var fechaAud []int
