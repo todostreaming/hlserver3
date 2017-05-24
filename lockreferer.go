@@ -77,6 +77,8 @@ func add_referrer(w http.ResponseWriter, r *http.Request) {
 	}
 	// ---- end of session identification -------------------------------
 
+	r.ParseForm() // recupera campos del form tanto GET como POST
+
 	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
 	if err != nil {
 		Error.Println(err)
@@ -84,15 +86,33 @@ func add_referrer(w http.ResponseWriter, r *http.Request) {
 	}
 	defer dbgeneral.Close()
 
-	r.ParseForm() // recupera campos del form tanto GET como POST
-	dbgen_mu.Lock()
-	_, err = dbgeneral.Exec("INSERT INTO players (`username`, `streamname`, `referrers`) VALUES (?, ?, ?)", username, r.FormValue("stream"), r.FormValue("domains"))
-	dbgen_mu.Unlock()
-	if err != nil {
+	// revisamos antes que no existe una regla anterior y si existe pues solo actualizamos
+	var id string
+	dbgen_mu.RLock()
+	err = dbgeneral.QueryRow("SELECT id FROM referer WHERE username = ? AND streamname = ?", username, r.FormValue("stream")).Scan(&id)
+	dbgen_mu.RUnlock()
+	if err == sql.ErrNoRows {
+		dbgen_mu.Lock()
+		_, err = dbgeneral.Exec("INSERT INTO players (`username`, `streamname`, `referrers`) VALUES (?, ?, ?)", username, r.FormValue("stream"), r.FormValue("domains"))
+		dbgen_mu.Unlock()
+		if err != nil {
+			Error.Println(err)
+			return
+		}
+	} else if err != nil {
 		Error.Println(err)
 		return
+	} else {
+		dbgen_mu.Lock()
+		_, err = dbgeneral.Exec("UPDATE players SET referrers = ? WHERE id = ?", r.FormValue("domains"), id)
+		dbgen_mu.Unlock()
+		if err != nil {
+			Error.Println(err)
+			return
+		}
 	}
 	Referer.Store(username+"-"+r.FormValue("stream"), r.FormValue("domains"))
+
 }
 
 func delreferer(w http.ResponseWriter, r *http.Request) {
@@ -120,6 +140,16 @@ func delreferer(w http.ResponseWriter, r *http.Request) {
 	defer dbgeneral.Close()
 
 	r.ParseForm() // recupera campos del form tanto GET como POST
+	// comprobamos y extraemos el stream al que se refiere
+	var streamname string
+	dbgen_mu.RLock()
+	err = dbgeneral.QueryRow("SELECT streamname FROM referer WHERE username = ? AND id = ?", username).Scan(&streamname)
+	dbgen_mu.RUnlock()
+	if err != nil {
+		Error.Println(err)
+		return
+	}
+
 	dbgen_mu.Lock()
 	_, err = dbgeneral.Exec("DELETE FROM users WHERE id = ? AND username = ?", r.FormValue("load"), username)
 	dbgen_mu.Unlock()
@@ -127,7 +157,5 @@ func delreferer(w http.ResponseWriter, r *http.Request) {
 		Error.Println(err)
 		return
 	}
-	rawstream := "" // username + "-" + streamname
-	Referer.Delete(rawstream)
-
+	Referer.Delete(username + "-" + streamname)
 }
