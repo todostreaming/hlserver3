@@ -74,10 +74,16 @@ func root(w http.ResponseWriter, r *http.Request) {
 				// we have to watch the referer, if allowed for this rawstream  ["rawstream"] = "domain1.com;domain2.com"
 				val, ok := Referer.Load(spl[0])
 				if ok {
-					// get the referrer from request and compare to the one in the map (url: http://www.w3.org/hypertext/DataSources/Overview.html)
-					if !strings.Contains(val.(string), getdomain(r.Referer())) {
-						http.NotFound(w, r)
-						return
+					// 1st we need to check if it is our hlserver playtv domain
+					mu_cloud.RLock()
+					ourdomain := cloud["cloudserver"]
+					mu_cloud.RUnlock()
+					if !strings.Contains(r.Referer(), ourdomain) { // it is not our playtv domain
+						// get the referrer from request and compare to the one in the map (url: http://www.w3.org/hypertext/DataSources/Overview.html)
+						if !strings.Contains(val.(string), getdomain(r.Referer())) {
+							http.NotFound(w, r)
+							return
+						}
 					}
 				}
 				fmt.Sscanf(spl[1], "wid%d", &id) // wid9876

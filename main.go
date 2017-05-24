@@ -139,10 +139,9 @@ func main() {
 	http.HandleFunc("/zeroFields.cgi", zeroFields)
 	http.HandleFunc("/formatDaylyhtml.cgi", formatDaylyhtml)
 	http.HandleFunc("/play.cgi", play)
-	/*
-		http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
-		http.HandleFunc("/playerStatNow.cgi", playerStatNow)
-	*/
+	http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
+	http.HandleFunc("/playerStatNow.cgi", playerStatNow)
+
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }
 
