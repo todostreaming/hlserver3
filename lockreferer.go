@@ -61,8 +61,73 @@ func listlocks(w http.ResponseWriter, r *http.Request) {
 
 func add_referrer(w http.ResponseWriter, r *http.Request) {
 
+	// --- we must identify the session user 1st ------------------------
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	key := cookie.Value
+	mu_user.RLock()
+	username, ok := user_[key] // De aquí podemos recoger el id del usuario logeado
+	mu_user.RUnlock()
+	if !ok {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	// ---- end of session identification -------------------------------
+
+	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
+	if err != nil {
+		Error.Println(err)
+		return
+	}
+	defer dbgeneral.Close()
+
+	r.ParseForm() // recupera campos del form tanto GET como POST
+	dbgen_mu.Lock()
+	_, err = dbgeneral.Exec("INSERT INTO players (`username`, `streamname`, `referrers`) VALUES (?, ?, ?)", username, r.FormValue("stream"), r.FormValue("domains"))
+	dbgen_mu.Unlock()
+	if err != nil {
+		Error.Println(err)
+		return
+	}
+	Referer.Store(username+"-"+r.FormValue("stream"), r.FormValue("domains"))
 }
 
 func delreferer(w http.ResponseWriter, r *http.Request) {
+	// --- we must identify the session user 1st ------------------------
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	key := cookie.Value
+	mu_user.RLock()
+	username, ok := user_[key] // De aquí podemos recoger el id del usuario logeado
+	mu_user.RUnlock()
+	if !ok {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	// ---- end of session identification -------------------------------
+
+	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
+	if err != nil {
+		Error.Println(err)
+		return
+	}
+	defer dbgeneral.Close()
+
+	r.ParseForm() // recupera campos del form tanto GET como POST
+	dbgen_mu.Lock()
+	_, err = dbgeneral.Exec("DELETE FROM users WHERE id = ? AND username = ?", r.FormValue("load"), username)
+	dbgen_mu.Unlock()
+	if err != nil {
+		Error.Println(err)
+		return
+	}
+	rawstream := "" // username + "-" + streamname
+	Referer.Delete(rawstream)
 
 }
