@@ -28,11 +28,13 @@ CREATE TABLE "users" (
 -- -----------------------------------------------------------------
 -- Table structure for referer (mirrored with an internal map)
 -- -----------------------------------------------------------------
+-- id 			= autoincrement key only for DB
 -- username		= 1st part in stream
 -- streamname	= 2nd part in stream
 -- referrers	= (;)separated pure domains allowed (if none = all)
 -- -----------------------------------------------------------------
 CREATE TABLE "referer" (
+"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 "username"  TEXT(255),
 "streamname"  TEXT(255),
 "referrers"  TEXT(1024)

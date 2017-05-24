@@ -168,6 +168,14 @@
     	        });
             });
         });
+        //Función que modifica por id el estado de un cliente
+       	function load(id){
+       		if (confirm("Sure you wanna delete this domain locking ?")){
+       	    	$.post("/delreferer.cgi", "load="+id ,function(data, status) {
+       	    		location.reload();
+       			});
+       		}
+       	}
 </script>
 </body>
 </html>

@@ -141,6 +141,9 @@ func main() {
 	http.HandleFunc("/play.cgi", play)
 	http.HandleFunc("/encoderStatNow.cgi", encoderStatNow)
 	http.HandleFunc("/playerStatNow.cgi", playerStatNow)
+	http.HandleFunc("/listlocks.cgi", listlocks)
+	http.HandleFunc("/add_referrer.cgi", add_referrer)
+	http.HandleFunc("/delreferer.cgi", delreferer)
 
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
 }

@@ -46,7 +46,7 @@ func encoderStatNow(w http.ResponseWriter, r *http.Request) {
 	}
 	key := cookie.Value
 	mu_user.RLock()
-	username, ok := id_[key] // De aquí podemos recoger el id del usuario logeado
+	username, ok := user_[key] // De aquí podemos recoger el id del usuario logeado
 	mu_user.RUnlock()
 	if !ok {
 		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
