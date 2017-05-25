@@ -51,7 +51,11 @@ func root(w http.ResponseWriter, r *http.Request) {
 				// we have the cookie so we have the ident of this player
 				key = cookie.Value // this is the id in string form
 			}
-			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%d\n%s.wid%s.m3u8\n", bps, rawstream, key)
+			rawquery := ""
+			if r.URL.RawQuery != "" {
+				rawquery = "?" + r.URL.RawQuery
+			}
+			resp = fmt.Sprintf("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%d\n%s.wid%s.m3u8%s\n", bps, rawstream, key, rawquery)
 			expiration := time.Now().Add(24 * time.Hour)
 			newcookie := http.Cookie{Name: rawstream, Value: key, Expires: expiration}
 			http.SetCookie(w, &newcookie)
@@ -286,6 +290,7 @@ func createstats(r *http.Request, rawstream string, id int64) {
 	// lets collect all the info to save in live.db
 	var ipclient, ipproxy, username, streamname, os string
 	var country, isocode, city string
+	// Mirar r.URL.RawQuery para extraer City si existe
 
 	tr := strings.Split(rawstream, "-")
 	if len(tr) != 2 {

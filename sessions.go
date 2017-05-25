@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"net/http"
 	"time"
 )
 
@@ -30,4 +31,23 @@ func sessionid(r *rand.Rand, n int) string {
 		b[i] = letterRunes[r.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+// call this request on every html from javascript setInterval(func, 20000)
+func autologout(w http.ResponseWriter, r *http.Request) {
+	// --- we must identify the session user 1st ------------------------
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	key := cookie.Value
+	mu_user.RLock()
+	_, ok := id_[key] // De aquí podemos recoger el id del usuario logeado
+	mu_user.RUnlock()
+	if !ok {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	// ---- end of session identification -------------------------------
 }
