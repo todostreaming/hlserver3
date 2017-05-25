@@ -244,8 +244,13 @@
         </div>
     </div>
 <script type="text/javascript">
+		function autologout() {
+		    $.post("/autologout.cgi", function(data, status) {
+		    });
+		}
         $(document).ready(function(){
-            $("#zonaGraficos").hide();
+        	setInterval("autologout()", 20000);
+        	$("#zonaGraficos").hide();
             //CUANDO SE RECARGA
             $.post("/giveFecha.cgi", function(data, status) {
                 $.each(data.split('&'), function (index, elem) {

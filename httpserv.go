@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -291,6 +292,8 @@ func createstats(r *http.Request, rawstream string, id int64) {
 	var ipclient, ipproxy, username, streamname, os string
 	var country, isocode, city string
 	// Mirar r.URL.RawQuery para extraer City si existe
+	query, _ := url.ParseQuery(r.URL.RawQuery)
+	City := query.Get("city")
 
 	tr := strings.Split(rawstream, "-")
 	if len(tr) != 2 {
@@ -307,6 +310,9 @@ func createstats(r *http.Request, rawstream string, id int64) {
 	os = getos(r.UserAgent())
 	country, isocode, city = geoIP(ipclient)
 	timestamp := time.Now().Unix()
+	if City != "" {
+		city = City
+	}
 
 	// store everything in live.db
 	mu_dblive.Lock()
@@ -330,12 +336,12 @@ func createstats(r *http.Request, rawstream string, id int64) {
 			seconds := timestamp - int64(timestamp_db)
 			if seconds > 30 { // reconnected from a previous disconn
 				mu_dblive.Lock()
-				dblive.Exec("UPDATE players SET time = 0, timestamp = ? WHERE id = ?", timestamp, id)
+				dblive.Exec("UPDATE players SET time = 0, timestamp = ?, city = ? WHERE id = ?", timestamp, city, id)
 				mu_dblive.Unlock()
 			} else { // still connected
 				KBs := kilobytes_db + (int64(bw) * seconds / 8192)
 				mu_dblive.Lock()
-				dblive.Exec("UPDATE players SET time = ?, total_time = ?, kilobytes = ?, timestamp = ? WHERE id = ?", time_db+seconds, total_time_db+seconds, KBs, timestamp, id)
+				dblive.Exec("UPDATE players SET time = ?, total_time = ?, kilobytes = ?, timestamp = ?, city = ? WHERE id = ?", time_db+seconds, total_time_db+seconds, KBs, timestamp, city, id)
 				mu_dblive.Unlock()
 			}
 		} else {

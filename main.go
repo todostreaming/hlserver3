@@ -378,6 +378,30 @@ func maintenance() {
 }
 
 func gethardware(w http.ResponseWriter, r *http.Request) {
+
+	// --- we must identify the session user 1st ------------------------
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	key := cookie.Value
+	mu_user.RLock()
+	_, ok := user_[key] // De aquí podemos recoger el id del usuario logeado
+	mu_user.RUnlock()
+	if !ok {
+		http.Redirect(w, r, "/"+first_page+".html", http.StatusFound)
+		return
+	}
+	// actualizamos la cookie actual
+	expiration := time.Now().Add(time.Duration(session_timeout) * time.Second)
+	newcookie := http.Cookie{Name: CookieName, Value: key, Expires: expiration}
+	http.SetCookie(w, &newcookie)
+	mu_user.Lock()
+	time_[key] = expiration
+	mu_user.Unlock()
+	// ---- end of session identification -------------------------------
+
 	st := Hardw.Status()
 
 	var cpu, ram, cpused, ramUsed, upload, download string
@@ -391,16 +415,6 @@ func gethardware(w http.ResponseWriter, r *http.Request) {
 		upload = fmt.Sprintf("%d Kbps", st.RXbps/1000)
 		download = fmt.Sprintf("%d Kbps", st.TXbps/1000)
 	}
-	/*
-		Quiero en la página una tabla con todos los datos expuestos y recargados automaticamente cada 10 segundos así:
-
-		"CPU: %s (%d cores)", st.CPUName, st.CPUCores
-		"RAM: %d MB\n", st.TotalMem/1024/1000
-		"CPU used: %d%%", int(st.CPUusage)
-		"RAM used: %2d%%", 100*st.UsedMem/st.TotalMem   (importante revisar que st.TotalMem > 0, o puede dar un panic por dividir por cero)
-		"Upload: %d Mbps", st.RXbps/1000000
-		"Download: %d Mbps", st.TXbps/1000000
-	*/
 
 	fmt.Fprintf(w, "%s;%s;%s;%s;%s;%s", cpu, ram, cpused, ramUsed, upload, download)
 }

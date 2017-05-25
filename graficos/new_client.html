@@ -142,7 +142,12 @@
     </div>
 </div>
     <script type="text/javascript">
+	function autologout() {
+	    $.post("/autologout.cgi", function(data, status) {
+	    });
+	}
     $(document).ready(function(){
+    	setInterval("autologout()", 20000);
 		$.get("/types.cgi", function(data, status) {
 			$("#type").html(data);
 		});

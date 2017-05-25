@@ -245,7 +245,12 @@
      </div>
 </div>
     <script type="text/javascript">
+		function autologout() {
+		    $.post("/autologout.cgi", function(data, status) {
+		    });
+		}
         $(document).ready(function(){
+        	setInterval("autologout()", 20000);
             //SE GENERA EL FORMULARIO
             $.post("/getMonthsYears.cgi",  function(data, status) {
                 var res = data.trim().split(";");

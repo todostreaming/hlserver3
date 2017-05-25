@@ -128,30 +128,35 @@
   </div>
 </div>
 <script type="text/javascript">
+	function autologout() {
+	    $.post("/autologout.cgi", function(data, status) {
+	    });
+	}
    $(document).ready(function(){
-   	$.post("/buscarClientes.cgi", function(data, status) {
-		$("#clients").html(data);
-       });
-   	$("#borrar").click(function(){
-   		$.post("/borrarCliente.cgi", $("#testform").serialize(), function(data, status) {
-   			// write a message displaying what happened
-			switch (data){
-			case "OK":
-				$("#msg").html("User successfully deleted. Please wait...");
-				break;
-			case "DUP":
-				$("#msg").html("User has clients on it (not deleted). Please wait...");
-				break;
-			case "BAD":
-				$("#msg").html("Database Error. Please wait...");
-				break;
-			}
-   			setTimeout(clearall,2000); // wait 2 seconds before cleaning the message
-   			function clearall(){
-   				location.reload();
-   			}
-        });
-   	});
+	   setInterval("autologout()", 20000);
+	   	$.post("/buscarClientes.cgi", function(data, status) {
+			$("#clients").html(data);
+	       });
+	   	$("#borrar").click(function(){
+	   		$.post("/borrarCliente.cgi", $("#testform").serialize(), function(data, status) {
+	   			// write a message displaying what happened
+				switch (data){
+				case "OK":
+					$("#msg").html("User successfully deleted. Please wait...");
+					break;
+				case "DUP":
+					$("#msg").html("User has clients on it (not deleted). Please wait...");
+					break;
+				case "BAD":
+					$("#msg").html("Database Error. Please wait...");
+					break;
+				}
+	   			setTimeout(clearall,2000); // wait 2 seconds before cleaning the message
+	   			function clearall(){
+	   				location.reload();
+	   			}
+	        });
+	   	});
    });
 </script>
 </body> 
