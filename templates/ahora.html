@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Streaming Control Panel</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="sr-only">Change navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">HLServer 3.0</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="active"><a href="#">Now</a></li>
+            <li><a href="#">Dayly</a></li>
+            <li><a href="#">Monthly</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Panel Password</a></li>
+            <li><a href="#">Publish Password</a></li>
+            <li><a href="#">Stream Locking</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> luztv</p></li>
+        <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container">
+  <h4 class="text-center">Connected the day 2017/05/31 at UTC 16:48</h4>
+  <table class="table table-hover table-condensed">
+    <thead>
+      <tr class="row">
+        <th class="hidden-xs col-sm-2">Country</th><!-- 16 chars max -->
+        <th class="col-1">&nbsp;</th>
+        <th class="hidden-xs col-sm-2">City</th><!-- 16 chars max -->
+        <th class="hidden-xs col-sm-2">IP</th>
+        <th class="col-xs-6 col-sm-2">Stream</th><!-- 16 chars max -->
+        <th class="col-1">OS</th>
+        <th class="col-xs-4 col-sm-2">Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row">
+        <td class="hidden-xs col-sm-2">United States</td>
+        <td class="col-1"><img src="images/es.png"/></td>
+        <td class="hidden-xs col-sm-2">Murcia</td>
+        <td class="hidden-xs col-sm-2">fe80::d6ae:52ff:fed3:ea66/64</td>
+        <td class="col-xs-6 col-sm-2">livestream</td>
+        <td class="col-sm-1"><img src="images/and.png"/></td>
+        <td class="col-xs-4 col-sm-2">125h:45m:59s</td>
+      </tr>
+      <tr class="row">
+        <td class="hidden-xs col-sm-2">Spain</td>
+        <td class="col-1"><img src="images/es.png"/></td>
+        <td class="hidden-xs col-sm-2">Murcia</td>
+        <td class="hidden-xs col-sm-2">64.89.125.92</td>
+        <td class="col-xs-6 col-sm-2">livestream</td>
+        <td class="col-1"><img src="images/mac.png"/></td>
+        <td class="col-xs-4 col-sm-2">5125h:45m:59s</td>
+      </tr>
+      <tr class="row">
+        <td class="hidden-xs col-sm-2">lavaquerieysetoca</td>
+        <td class="col-sm-1"><img src="images/es.png"/></td>
+        <td class="hidden-xs col-sm-2">lavaquerieysetoca</td>
+        <td class="hidden-xs col-sm-2">64.89.125.92</td>
+        <td class="col-xs-6 col-sm-2">lavaquerieysetoca</td>
+        <td class="col-1"><img src="images/win.png"/></td>
+        <td class="col-xs-4 col-sm-2">8125h:45m:59s</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
