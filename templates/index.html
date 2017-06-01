@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Streaming Control Panel</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="dist/Chart.bundle.js"></script>        
+</head>
+<body>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<!-- common -->
+<div class="container" align="center">
+    <div>
+        <div class="row">
+            <div class="col-xs-1 col-sm-4">&nbsp;</div>
+            <div class="col-xs-10 col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Log in
+                    </div>
+                    <div class="panel-body">
+                        <form>
+                          <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input id="user" type="text" class="form-control" name="user" placeholder="Username" required autofocus>
+                          </div>
+                          <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            <input id="password" type="password" class="form-control" name="password" placeholder="Password" required>
+                          </div>
+                          <div class="text-success" id="stat">&nbsp;</div>
+                          <button type="submit" class="btn btn-primary">Enter</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-1 col-sm-4">&nbsp;</div>
+        </div>
+    </div>
+</div>    
+
+</body>
+</html>

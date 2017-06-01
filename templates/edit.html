@@ -29,13 +29,13 @@
           <ul class="dropdown-menu">
             <li><a href="#">Now</a></li>
             <li><a href="#">Dayly</a></li>
-            <li class="active"><a href="#">Monthly</a></li>
+            <li><a href="#">Monthly</a></li>
           </ul>
         </li>
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Panel Password</a></li>
+            <li class="active"><a href="#">Panel Password</a></li>
             <li><a href="#">Publish Password</a></li>
             <li><a href="#">Stream Locking</a></li>
           </ul>
@@ -49,6 +49,41 @@
   </div>
 </nav>
 
+<!-- common -->
+<div class="container" align="center">
+    <h4 class="text-center text-primary">Panel Password <span class="visible-xs"><small>(luztv)</small></span></h4>
+    <div>
+        <div class="row">
+            <div class="col-xs-1 col-sm-4">&nbsp;</div>
+            <div class="col-xs-10 col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Change Password
+                    </div>
+                    <div class="panel-body">
+                        <form>
+                          <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input id="email" type="text" class="form-control" name="email" value="luztv" readonly>
+                          </div>
+                          <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            <input id="password" type="password" class="form-control" name="password" placeholder="Password" required autofocus>
+                          </div>
+                          <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            <input id="repassword" type="password" class="form-control" name="repeat-password" placeholder="Repeat password" required>
+                          </div>
+                          <div class="text-success" id="stat"><strong>correctly changed</strong></div>
+                          <button type="submit" class="btn btn-primary">Change</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-1 col-sm-4">&nbsp;</div>
+        </div>
+    </div>
+</div>    
 
 </body>
 </html>
