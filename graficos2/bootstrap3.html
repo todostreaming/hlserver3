@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Streaming Control Panel</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="dist/Chart.bundle.js"></script>        
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="sr-only">Change navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">HLServer 3.0</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Now</a></li>
+            <li><a href="#">Dayly</a></li>
+            <li class="active"><a href="#">Monthly</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Panel Password</a></li>
+            <li><a href="#">Publish Password</a></li>
+            <li><a href="#">Stream Locking</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="hidden-xs"><p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> luztv</p></li>
+        <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+</body>
+</html>
