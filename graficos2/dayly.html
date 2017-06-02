@@ -1,154 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>Streaming Control Panel</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Streaming Control Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/epoch_styles.css" />
     <script type="text/javascript" src="js/epoch_classes.js"></script>
     <script type="text/javascript">
-    var bas_cal,dp_cal,ms_cal;      
-    window.onload = function () {
-        dp_cal  = new Epoch('epoch_popup','popup',document.getElementById('popup_container'));
-    };
-    </script> 
-    <script src="dist/Chart.bundle.js"></script>        
+        var bas_cal, dp_cal, ms_cal;
+        window.onload = function() {
+            dp_cal = new Epoch('epoch_popup', 'popup', document.getElementById('popup_container'));
+        };
+
+    </script>
+    <script src="dist/Chart.bundle.js"></script>
 </head>
+
 <body>
 
-<nav class="navbar navbar-inverse">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="sr-only">Change navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#">HLServer 3.0</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="dropdown active">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="ahora.html">Now</a></li>
-            <li class="active"><a href="dayly.html">Dayly</a></li>
-            <li><a href="monthly.html">Monthly</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="edit.html">Panel Password</a></li>
-            <li><a href="publish.html">Publish Password</a></li>
-            <li><a href="locks.html">Stream Locking</a></li>
-          </ul>
-        </li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="hidden-xs"><p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> luztv</p></li>
-        <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+                <a class="navbar-brand" href="#">HLServer 3.0</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown active">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="ahora.html">Now</a></li>
+                            <li class="active"><a href="dayly.html">Dayly</a></li>
+                            <li><a href="monthly.html">Monthly</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="edit.html">Panel Password</a></li>
+                            <li><a href="publish.html">Publish Password</a></li>
+                            <li><a href="locks.html">Stream Locking</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden-xs">
+                        <p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> luztv</p>
+                    </li>
+                    <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<!-- common -->
-<div class="container text-center">
-  <h4>Stats corresponding to 2017/05/31 <span class="visible-xs"><small>(luztv)</small></span></h4>
-   <div class="row">
-       <div class="col-xs-2 col-sm-4 col-md-5">&nbsp;</div>
-       <div class="col-xs-8 col-sm-4 col-md-2">
-        <form>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Date" name="fecha" id="popup_container">
-            <div class="input-group-btn">
-              <button class="btn btn-primary" type="submit">
+    <!-- common -->
+    <div class="container text-center">
+        <h4>Stats corresponding to 2017/05/31 <span class="visible-xs"><small>(luztv)</small></span></h4>
+        <div class="row">
+            <div class="col-xs-2 col-sm-4 col-md-5">&nbsp;</div>
+            <div class="col-xs-8 col-sm-4 col-md-2">
+                <form>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Date" name="fecha" id="popup_container">
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary" type="submit">
                 <i class="glyphicon glyphicon-search"></i>
               </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-          </div>
-        </form> 
-       </div>
-       <div class="col-xs-2 col-sm-4 col-md-5">&nbsp;</div>
-   </div>
-</div>
-
-<!-- tables for mobiles -->
-<div class="container">
- <div class="visible-xs">
-  <h5 class="text-center text-primary"><strong>Players per Hours</strong></h5>
-  <table class="table table-hover table-condensed">
-    <thead class="bg-primary">
-      <tr class="row">
-        <th class="col-xs-2">Hour</th>
-        <th class="col-xs-5">Players</th>
-        <th class="col-xs-5">Minutes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="row">
-        <td class="col-xs-2">1:00</td>
-        <td class="col-xs-5">5</td>
-        <td class="col-xs-5">210</td>
-      </tr>
-      <tr class="row">
-        <td class="col-xs-2">2:00</td>
-        <td class="col-xs-5">50</td>
-        <td class="col-xs-5">1560</td>
-      </tr>
-      <tr class="row">
-        <td class="col-xs-2">3:00</td>
-        <td class="col-xs-5">145</td>
-        <td class="col-xs-5">3625</td>
-      </tr>
-      <tr class="row">
-        <td class="col-xs-2">4:00</td>
-        <td class="col-xs-5">145900</td>
-        <td class="col-xs-5">8754000</td>
-      </tr>
-      <tr class="row">
-        <td class="col-xs-2">5:00</td>
-        <td class="col-xs-5">0</td>
-        <td class="col-xs-5">0</td>
-      </tr>
-      <tr class="row">
-        <td class="col-xs-2">6:00</td>
-        <td class="col-xs-5">0</td>
-        <td class="col-xs-5">0</td>
-      </tr>
-    </tbody>
-  </table>
- </div>
-</div>    
-
-<!-- graphics for tablets and above -->
-<div class="container">
-    <div class="hidden-xs">
-       <br/>
-        <div class="row">
-            <div class="col-sm-1">&nbsp;</div>
-            <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
-            <div class="col-sm-1">&nbsp;</div>
+            <div class="col-xs-2 col-sm-4 col-md-5">&nbsp;</div>
         </div>
-        <br/>
-        <div class="row">
-            <div class="col-sm-1">&nbsp;</div>
-            <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
-            <div class="col-sm-1">&nbsp;</div>
-        </div>
-        <br/>
-        <div class="row">
-            <div class="col-sm-1">&nbsp;</div>
-            <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
-            <div class="col-sm-1">&nbsp;</div>
-        </div> 
     </div>
-</div>    
+
+    <!-- tables for mobiles -->
+    <div class="container">
+        <div class="visible-xs">
+            <h5 class="text-center text-primary"><strong>Players per Hours</strong></h5>
+            <table class="table table-hover table-condensed">
+                <thead class="bg-primary">
+                    <tr class="row">
+                        <th class="col-xs-2">Hour</th>
+                        <th class="col-xs-5">Players</th>
+                        <th class="col-xs-5">Minutes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row">
+                        <td class="col-xs-2">1:00</td>
+                        <td class="col-xs-5">5</td>
+                        <td class="col-xs-5">210</td>
+                    </tr>
+                    <tr class="row">
+                        <td class="col-xs-2">2:00</td>
+                        <td class="col-xs-5">50</td>
+                        <td class="col-xs-5">1560</td>
+                    </tr>
+                    <tr class="row">
+                        <td class="col-xs-2">3:00</td>
+                        <td class="col-xs-5">145</td>
+                        <td class="col-xs-5">3625</td>
+                    </tr>
+                    <tr class="row">
+                        <td class="col-xs-2">4:00</td>
+                        <td class="col-xs-5">145900</td>
+                        <td class="col-xs-5">8754000</td>
+                    </tr>
+                    <tr class="row">
+                        <td class="col-xs-2">5:00</td>
+                        <td class="col-xs-5">0</td>
+                        <td class="col-xs-5">0</td>
+                    </tr>
+                    <tr class="row">
+                        <td class="col-xs-2">6:00</td>
+                        <td class="col-xs-5">0</td>
+                        <td class="col-xs-5">0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- graphics for tablets and above -->
+    <div class="container">
+        <div class="hidden-xs">
+            <br/>
+            <div class="row">
+                <div class="col-sm-1">&nbsp;</div>
+                <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
+                <div class="col-sm-1">&nbsp;</div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-sm-1">&nbsp;</div>
+                <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
+                <div class="col-sm-1">&nbsp;</div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-sm-1">&nbsp;</div>
+                <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
+                <div class="col-sm-1">&nbsp;</div>
+            </div>
+        </div>
+    </div>
 
 </body>
+
 </html>

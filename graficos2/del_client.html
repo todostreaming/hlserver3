@@ -1,77 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>Streaming Control Panel</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Streaming Control Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+
 <body>
 
-<nav class="navbar navbar-inverse">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="sr-only">Change navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#">HLServer 3.0</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="dropdown active">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Clients <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="new_client.html">New Client</a></li>
-            <li class="active"><a href="del_client.html">Delete Client</a></li>
-          </ul>
-        </li>
-        <li><a href="monthly_admin.html">Stats</a></li>
-        <li><a href="hardware.html">Hardware</a></li>
-        <li><a href="editarAdmin.html">Password</a></li>
-        </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="hidden-xs"><p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> admin</p></li>
-        <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+                <a class="navbar-brand" href="#">HLServer 3.0</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown active">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Clients <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="new_client.html">New Client</a></li>
+                            <li class="active"><a href="del_client.html">Delete Client</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="monthly_admin.html">Stats</a></li>
+                    <li><a href="hardware.html">Hardware</a></li>
+                    <li><a href="editarAdmin.html">Password</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden-xs">
+                        <p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> admin</p>
+                    </li>
+                    <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<!-- common -->
-<div class="container">
-    <h4 class="text-center text-primary">Delete a Customer <span class="visible-xs"><small>(admin)</small></span></h4>
-    <div>
-        <div class="row">
-            <div class="col-xs-1 col-sm-4">&nbsp;</div>
-            <div class="col-xs-10 col-sm-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading text-center">
-                        select the customer to delete
-                    </div>
-                    <div class="panel-body">
-                        <form>
-                          <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                            <select class="form-control" name="username" id="user">
+    <!-- common -->
+    <div class="container">
+        <h4 class="text-center text-primary">Delete a Customer <span class="visible-xs"><small>(admin)</small></span></h4>
+        <div>
+            <div class="row">
+                <div class="col-xs-1 col-sm-4">&nbsp;</div>
+                <div class="col-xs-10 col-sm-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading text-center">
+                            select the customer to delete
+                        </div>
+                        <div class="panel-body">
+                            <form>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <select class="form-control" name="username" id="user">
                                 <option value="pedro">pedro</option>
                                 <option value="pepe">pepe</option>
                                 <option value="juan">juan</option>
                             </select>
-                          </div><br/>
-                          <div align="center"><button type="submit" class="btn btn-primary" >Delete</button></div>
-                        </form>
+                                </div><br/>
+                                <div align="center"><button type="submit" class="btn btn-primary">Delete</button></div>
+                            </form>
+                        </div>
                     </div>
                 </div>
+                <div class="col-xs-1 col-sm-4">&nbsp;</div>
             </div>
-            <div class="col-xs-1 col-sm-4">&nbsp;</div>
         </div>
     </div>
-</div>    
 
 </body>
+
 </html>

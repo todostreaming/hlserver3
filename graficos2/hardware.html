@@ -1,98 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>Streaming Control Panel</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Streaming Control Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+
 <body>
 
-<nav class="navbar navbar-inverse">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="sr-only">Change navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#">HLServer 3.0</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Clients <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="new_client.html">New Client</a></li>
-            <li><a href="del_client.html">Delete Client</a></li>
-          </ul>
-        </li>
-        <li><a href="monthly_admin.html">Stats</a></li>
-        <li class="active"><a href="hardware.html">Hardware</a></li>
-        <li><a href="editarAdmin.html">Password</a></li>
-        </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="hidden-xs"><p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> admin</p></li>
-        <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+                <a class="navbar-brand" href="#">HLServer 3.0</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Clients <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="new_client.html">New Client</a></li>
+                            <li><a href="del_client.html">Delete Client</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="monthly_admin.html">Stats</a></li>
+                    <li class="active"><a href="hardware.html">Hardware</a></li>
+                    <li><a href="editarAdmin.html">Password</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden-xs">
+                        <p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> admin</p>
+                    </li>
+                    <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<!-- common -->
-<div class="container" align="center">
-    <h4 class="text-center text-primary">Hardware <span class="visible-xs"><small>(admin)</small></span></h4>
-    <div>
-        <div class="row">
-            <div class="col-xs-1 col-sm-3">&nbsp;</div>
-            <div class="col-xs-10 col-sm-6">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        Hardware Status
-                    </div>
-                    <div class="panel-body">
-                      <table class="table table-striped table-condensed">
-                        <tbody>
-                          <tr class="row">
-                            <td class="col-xs-5 col-sm-2 text-success"><strong>CPU:</strong></td><!-- 16 chars max -->
-                            <td class="col-xs-7 col-sm-10" align="right">Intel(R) Xeon(R) CPU E3-1230 v5 @ 3.40GHz (8 cores)</td><!-- 16 chars max -->
-                          </tr>
-                          <tr class="row">
-                            <td class="col-xs-5 col-sm-2 text-success"><strong>RAM:</strong></td><!-- 16 chars max -->
-                            <td class="col-xs-7 col-sm-10" align="right">32693 MB</td><!-- 16 chars max -->
-                          </tr>
-                          <tr class="row">
-                            <td class="col-xs-5 col-sm-2 text-success"><strong>CPU used:</strong></td><!-- 16 chars max -->
-                            <td class="col-xs-7 col-sm-10" align="right">0%</td><!-- 16 chars max -->
-                          </tr>
-                          <tr class="row">
-                            <td class="col-xs-5 col-sm-2 text-success"><strong>RAM used:</strong></td><!-- 16 chars max -->
-                            <td class="col-xs-7 col-sm-10" align="right">10%</td><!-- 16 chars max -->
-                          </tr>
-                          <tr class="row">
-                            <td class="col-xs-5 col-sm-2 text-success"><strong>Upload:</strong></td><!-- 16 chars max -->
-                            <td class="col-xs-7 col-sm-10" align="right">8971 kbps</td><!-- 16 chars max -->
-                          </tr>
-                          <tr class="row">
-                            <td class="col-xs-5 col-sm-2 text-success"><strong>Download:</strong></td><!-- 16 chars max -->
-                            <td class="col-xs-7 col-sm-10" align="right">32693 kbps</td><!-- 16 chars max -->
-                          </tr>
-                          <tr class="row">
-                            <td class="col-xs-5 col-sm-2 text-success">&nbsp;</td><!-- 16 chars max -->
-                            <td class="col-xs-7 col-sm-10" align="right">&nbsp;</td><!-- 16 chars max -->
-                          </tr>
-                        </tbody>
-                      </table>
+    <!-- common -->
+    <div class="container" align="center">
+        <h4 class="text-center text-primary">Hardware <span class="visible-xs"><small>(admin)</small></span></h4>
+        <div>
+            <div class="row">
+                <div class="col-xs-1 col-sm-3">&nbsp;</div>
+                <div class="col-xs-10 col-sm-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            Hardware Status
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped table-condensed">
+                                <tbody>
+                                    <tr class="row">
+                                        <td class="col-xs-5 col-sm-2 text-success"><strong>CPU:</strong></td>
+                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right">Intel(R) Xeon(R) CPU E3-1230 v5 @ 3.40GHz (8 cores)</td>
+                                        <!-- 16 chars max -->
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-5 col-sm-2 text-success"><strong>RAM:</strong></td>
+                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right">32693 MB</td>
+                                        <!-- 16 chars max -->
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-5 col-sm-2 text-success"><strong>CPU used:</strong></td>
+                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right">0%</td>
+                                        <!-- 16 chars max -->
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-5 col-sm-2 text-success"><strong>RAM used:</strong></td>
+                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right">10%</td>
+                                        <!-- 16 chars max -->
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-5 col-sm-2 text-success"><strong>Upload:</strong></td>
+                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right">8971 kbps</td>
+                                        <!-- 16 chars max -->
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-5 col-sm-2 text-success"><strong>Download:</strong></td>
+                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right">32693 kbps</td>
+                                        <!-- 16 chars max -->
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-5 col-sm-2 text-success">&nbsp;</td>
+                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right">&nbsp;</td>
+                                        <!-- 16 chars max -->
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+                <div class="col-xs-1 col-sm-3">&nbsp;</div>
             </div>
-            <div class="col-xs-1 col-sm-3">&nbsp;</div>
         </div>
     </div>
-</div>    
 
 </body>
+
 </html>
