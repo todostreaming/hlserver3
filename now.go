@@ -61,8 +61,10 @@ func encoderStatNow(w http.ResponseWriter, r *http.Request) {
 	mu_user.Unlock()
 	// ---- end of session identification -------------------------------
 
+	response := "<table class=\"table table-hover table-condensed\"><thead class=\"bg-danger\"><tr class=\"row\"><th class=\"col-1\">&nbsp;</th><th class=\"hidden-xs col-sm-4\">Info</th><th class=\"hidden-xs col-sm-3\">IP</th><th class=\"col-xs-6 col-sm-2\">Stream</th><th class=\"col-1\">&nbsp;</th><th class=\"col-xs-4 col-sm-2\">Time</th></tr></thead><tbody>"
+	counter := 0
 	anio, mes, dia := time.Now().Date()
-	fecha := fmt.Sprintf("%02d/%02d/%02d", dia, mes, anio)
+	fecha := fmt.Sprintf("%d/%02d/%02d", anio, mes, dia)
 	hh, mm, _ := time.Now().Clock()
 	hora := fmt.Sprintf("%02d:%02d", hh, mm)
 	tiempo_limite := time.Now().Unix() - 6 //tiempo limite de 6 seg
@@ -71,19 +73,21 @@ func encoderStatNow(w http.ResponseWriter, r *http.Request) {
 		Error.Println(err)
 		return
 	}
-	fmt.Fprintf(w, "<h1>%s</h1><p><b>Conected on %s at %s UTC</b></p><table class=\"table table-striped table-bordered table-hover\"><th>Play</th><th>INFO</th><th>Country</th><th>IP</th><th>Stream</th><th>Connected time</th>", username, fecha, hora)
 	for query.Next() {
+		counter++
 		var isocode, country, streamname, ip, time_connect, info string
 		var tiempo, bitrate int
 		query.Scan(&streamname, &isocode, &ip, &country, &tiempo, &bitrate, &info)
 		isocode = strings.ToLower(isocode)
 		time_connect = secs2time(tiempo)
 		INFO := fmt.Sprintf("%s [%d kbps]", info, bitrate/1000)
-		fmt.Fprintf(w, "<tr><td><a href=\"javascript:launchRemote('play.cgi?stream=%s')\"><img src='images/play.jpg' border='0' title='Play %s'/></a></td><td>%s</td><td><img src=\"images/flags/%s.png\" title=\"%s\"></td><td>%s</td><td>%s</td><td>%s</td></tr>",
-			streamname, streamname, INFO, isocode, country, ip, streamname, time_connect)
+		response = response + fmt.Sprintf("<tr class=\"row\"><td class=\"col-1\"><a href=\"javascript:launchRemote('play.cgi?stream=%s')\"><img src=\"images/play.jpg\" border=\"0\"/></a></td><td class=\"hidden-xs col-sm-4\">%s</td><td class=\"hidden-xs col-sm-3\">%s</td><td class=\"col-xs-6 col-sm-2\">%s</td><td class=\"col-1\"><img src=\"images/flags/%s.png\"/></td><td class=\"col-xs-4 col-sm-2\">%s</td></tr>",
+			streamname, INFO, ip, streamname, isocode, time_connect)
 	}
 	query.Close()
-	fmt.Fprintf(w, "</table>")
+	// construir la respuesta
+	response = fmt.Sprintf("<h4 class=\"text-center\">Connected the day %s at UTC %s <span class=\"visible-xs\"><small>(%s)</small></span></h4><h5 class=\"text-center text-danger\"><strong>%d encoders connected</strong></h5>", fecha, hora, username, counter) + response + "</tbody></table></div>"
+	fmt.Fprintf(w, response)
 }
 
 func playerStatNow(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +108,8 @@ func playerStatNow(w http.ResponseWriter, r *http.Request) {
 	}
 	// ---- end of session identification -------------------------------
 
-	var contador int
+	var contador, counter int
+	response := ""
 	tiempo_limite := time.Now().Unix() - 30 //tiempo limite de 30 seg
 	err = dblive.QueryRow("SELECT count(id) FROM players WHERE username = ? AND timestamp > ? AND time > 0", username, tiempo_limite).Scan(&contador)
 	if err != nil {
@@ -112,29 +117,25 @@ func playerStatNow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if contador >= 100 {
+		counter++
 		query, err := dblive.Query("SELECT isocode, country, count(ipclient) AS count, streamname FROM players WHERE username = ? AND timestamp > ? AND time > 0 GROUP BY isocode, streamname ORDER BY streamname, count DESC", username, tiempo_limite)
 		if err != nil {
 			Error.Println(err)
 			return
 		}
-		fmt.Fprintf(w, "<table class=\"table table-striped table-bordered table-hover\"><th>Country</th><th>Number of Players</th><th>Stream</th>")
-		fmt.Fprintf(w, "<tr><td align=\"center\" colspan='3'><b>Total:</b> %d players conectados</td></tr>", contador)
 		for query.Next() {
 			var isocode, country, ips, streamname string
 			query.Scan(&isocode, &country, &ips, &streamname)
 			isocode = strings.ToLower(isocode)
-			fmt.Fprintf(w, "<tr><td>%s <img class='pull-right' src=\"images/flags/%s.png\" title=\"%s\"></td><td>%s</td><td>%s</td></tr>",
-				country, isocode, country, ips, streamname)
+			response = response + fmt.Sprintf("<tr class=\"row\"><td class=\"hidden-xs col-sm-4\">%s</td><td class=\"col-2\"><img src=\"images/flags/%s.png\" title=\"%s\"/></td><td class=\"col-xs-5 col-sm-3\">25</td><td class=\"col-xs-5 col-sm-4\">%s</td></tr>",
+				country, isocode, country, streamname)
 		}
 		query.Close()
-		fmt.Fprintf(w, "</table>")
 	} else {
 		query, err := dblive.Query("SELECT isocode, country, city, ipclient, os, streamname, time FROM players WHERE username = ? AND timestamp > ? AND time > 0 ORDER BY streamname, time DESC", username, tiempo_limite)
 		if err != nil {
 			Warning.Println(err)
 		}
-		fmt.Fprintf(w, "<table class=\"table table-striped table-bordered table-hover\"><th>País</th><th>Region</th><th>Ciudad</th><th>Dirección IP</th><th>Stream</th><th>O.S</th><th>Tiempo conectado</th>")
-		fmt.Fprintf(w, "<tr><td align=\"center\" colspan='7'><b>Total:</b> %d players conectados</td></tr>", contador)
 		for query.Next() {
 			var isocode, country, city, ipclient, os, streamname, time_connect string
 			var tiempo int
@@ -144,10 +145,17 @@ func playerStatNow(w http.ResponseWriter, r *http.Request) {
 			}
 			isocode = strings.ToLower(isocode)
 			time_connect = secs2time(tiempo)
-			fmt.Fprintf(w, "<tr><td>%s <img class='pull-right' src=\"images/flags/%s.png\" title=\"%s\"></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>",
+			response = response + fmt.Sprintf("<tr class=\"row\"><td class=\"hidden-xs col-sm-2\">%s</td><td class=\"col-1\"><img src=\"images/flags/%s.png\" title=\"%s\"/></td><td class=\"hidden-xs col-sm-2\">%s</td><td class=\"hidden-xs col-sm-2\">%s</td><td class=\"col-xs-6 col-sm-2\">%s</td><td class=\"col-1\"><img src=\"images/os/%s.png\"/></td><td class=\"col-xs-4 col-sm-2\">%s</td></tr>",
 				country, isocode, country, city, ipclient, streamname, os, time_connect)
 		}
 		query.Close()
-		fmt.Fprintf(w, "</table>")
 	}
+	// creamos la salida
+	if contador >= 100 {
+		response = fmt.Sprintf("<h5 class=\"text-center text-primary\"><strong>%d players connected</strong></h5><table class=\"table table-hover table-condensed\"><thead class=\"bg-primary\"><tr class=\"row\"><th class=\"hidden-xs col-sm-2\">Country</th><th class=\"col-1\">&nbsp;</th><th class=\"hidden-xs col-sm-2\">City</th><th class=\"hidden-xs col-sm-2\">IP</th><th class=\"col-xs-6 col-sm-2\">Stream</th><th class=\"col-1\">OS</th><th class=\"col-xs-4 col-sm-2\">Time</th></tr></thead><tbody>", contador) + response + "</tbody></table></div>"
+	} else {
+		response = fmt.Sprintf("<div class=\"container\"><h5 class=\"text-center text-primary\"><strong>%d players connected from %d countries</strong></h5><table class=\"table table-hover table-condensed\"><thead class=\"bg-primary\"><tr class=\"row\"><th class=\"hidden-xs col-sm-4\">Country</th><th class=\"col-2\">&nbsp;</th><th class=\"col-xs-5 col-sm-3\">Players</th><th class=\"col-xs-5 col-sm-4\">Stream</th></tr></thead><tbody>", contador, counter) + response + "</tbody></table></div>"
+	}
+	fmt.Fprintf(w, response)
+
 }
