@@ -75,14 +75,17 @@ func encoderStatNow(w http.ResponseWriter, r *http.Request) {
 	}
 	for query.Next() {
 		counter++
-		var isocode, country, streamname, ip, time_connect, info string
+		var isocode, country, streamname, ip, time_connect, info, shortstreamname string
 		var tiempo, bitrate int
 		query.Scan(&streamname, &isocode, &ip, &country, &tiempo, &bitrate, &info)
 		isocode = strings.ToLower(isocode)
 		time_connect = secs2time(tiempo)
 		INFO := fmt.Sprintf("%s [%d kbps]", info, bitrate/1000)
+		if len(streamname) > 16 {
+			shortstreamname = streamname[0:15]
+		}
 		response = response + fmt.Sprintf("<tr class=\"row\"><td class=\"col-1\"><a href=\"javascript:launchRemote('play.cgi?stream=%s')\"><img src=\"images/play.jpg\" border=\"0\"/></a></td><td class=\"hidden-xs col-sm-4\">%s</td><td class=\"hidden-xs col-sm-3\">%s</td><td class=\"col-xs-6 col-sm-2\">%s</td><td class=\"col-1\"><img src=\"images/flags/%s.png\"/></td><td class=\"col-xs-4 col-sm-2\">%s</td></tr>",
-			streamname, INFO, ip, streamname, isocode, time_connect)
+			streamname, INFO, ip, shortstreamname, isocode, time_connect)
 	}
 	query.Close()
 	// construir la respuesta
@@ -124,11 +127,14 @@ func playerStatNow(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for query.Next() {
-			var isocode, country, ips, streamname string
+			var isocode, country, ips, streamname, shortstreamname string
 			query.Scan(&isocode, &country, &ips, &streamname)
 			isocode = strings.ToLower(isocode)
+			if len(streamname) > 16 {
+				shortstreamname = streamname[0:15]
+			}
 			response = response + fmt.Sprintf("<tr class=\"row\"><td class=\"hidden-xs col-sm-4\">%s</td><td class=\"col-2\"><img src=\"images/flags/%s.png\" title=\"%s\"/></td><td class=\"col-xs-5 col-sm-3\">25</td><td class=\"col-xs-5 col-sm-4\">%s</td></tr>",
-				country, isocode, country, streamname)
+				country, isocode, country, shortstreamname)
 		}
 		query.Close()
 	} else {
@@ -137,7 +143,7 @@ func playerStatNow(w http.ResponseWriter, r *http.Request) {
 			Warning.Println(err)
 		}
 		for query.Next() {
-			var isocode, country, city, ipclient, os, streamname, time_connect string
+			var isocode, country, city, ipclient, os, streamname, time_connect, shortstreamname, shortcountry string
 			var tiempo int
 			err = query.Scan(&isocode, &country, &city, &ipclient, &os, &streamname, &tiempo)
 			if err != nil {
@@ -145,8 +151,14 @@ func playerStatNow(w http.ResponseWriter, r *http.Request) {
 			}
 			isocode = strings.ToLower(isocode)
 			time_connect = secs2time(tiempo)
+			if len(streamname) > 16 {
+				shortstreamname = streamname[0:15]
+			}
+			if len(country) > 16 {
+				shortcountry = country[0:15]
+			}
 			response = response + fmt.Sprintf("<tr class=\"row\"><td class=\"hidden-xs col-sm-2\">%s</td><td class=\"col-1\"><img src=\"images/flags/%s.png\" title=\"%s\"/></td><td class=\"hidden-xs col-sm-2\">%s</td><td class=\"hidden-xs col-sm-2\">%s</td><td class=\"col-xs-6 col-sm-2\">%s</td><td class=\"col-1\"><img src=\"images/os/%s.png\"/></td><td class=\"col-xs-4 col-sm-2\">%s</td></tr>",
-				country, isocode, country, city, ipclient, streamname, os, time_connect)
+				shortcountry, isocode, country, city, ipclient, shortstreamname, os, time_connect)
 		}
 		query.Close()
 	}
