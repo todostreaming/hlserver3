@@ -73,9 +73,7 @@
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
                                     <input id="domains" type="text" class="form-control" name="domains" placeholder="domain1.com;domain2.com" required>
                                 </div>
-                                <div class="text-success" id="stat"><strong>correctly locked</strong></div>
-                                <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-lock"></span>&nbsp;Lock</button>
-                                <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-lock"></span>&nbsp;UnLock</button>
+                                <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-lock"></span>&nbsp;Lock</button>
                             </form>
                         </div>
                     </div>
@@ -84,6 +82,39 @@
             </div>
         </div>
     </div>
+
+    <!-- table -->
+    <div class="container">
+        <div id="campos"></div>
+    </div>
+
+    <script type="text/javascript">
+        function autologout() {
+            $.post("/autologout.cgi", function(data, status) {});
+        }
+        $(document).ready(function() {
+            setInterval("autologout()", 20000);
+            $.post("/listlocks.cgi", function(data, status) {
+                $("#campos").html(data);
+            });
+            $("#enviar").click(function() {
+                $.post("/add_referrer.cgi", $("#testform").serialize(), function(data, status) {
+                    $("#stream").val("");
+                    $("#domains").val("");
+                    location.reload();
+                });
+            });
+        });
+        //Función que modifica por id el estado de un cliente
+        function load(id) {
+            if (confirm("Sure you wanna delete this domain locking ?")) {
+                $.post("/delreferer.cgi", "load=" + id, function(data, status) {
+                    location.reload();
+                });
+            }
+        }
+
+    </script>
 
 </body>
 

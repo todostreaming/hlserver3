@@ -1,85 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>Streaming Control Panel</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Streaming Control Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+
 <body>
 
-<nav class="navbar navbar-inverse">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="sr-only">Change navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#">HLServer 3.0</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Now</a></li>
-            <li><a href="#">Dayly</a></li>
-            <li><a href="#">Monthly</a></li>
-          </ul>
-        </li>
-        <li class="dropdown active">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Panel Password</a></li>
-            <li><a href="#">Publish Password</a></li>
-            <li class="active"><a href="#">Stream Locking</a></li>
-          </ul>
-        </li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="hidden-xs"><p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> luztv</p></li>
-        <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+                <a class="navbar-brand" href="#">HLServer 3.0</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Now</a></li>
+                            <li><a href="#">Dayly</a></li>
+                            <li><a href="#">Monthly</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown active">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Panel Password</a></li>
+                            <li><a href="#">Publish Password</a></li>
+                            <li class="active"><a href="#">Stream Locking</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden-xs">
+                        <p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> luztv</p>
+                    </li>
+                    <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<!-- common -->
-<div class="container" align="center">
-    <h4 class="text-center text-primary">Stream Locking <span class="visible-xs"><small>(luztv)</small></span></h4>
-    <div>
-        <div class="row">
-            <div class="col-xs-1 col-sm-4">&nbsp;</div>
-            <div class="col-xs-10 col-sm-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        Lock stream to domain(s)
-                    </div>
-                    <div class="panel-body">
-                        <form>
-                          <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon  glyphicon-film"></i></span>
-                            <input id="stream" type="text" class="form-control" name="stream" placeholder="streamname" required autofocus>
-                          </div>
-                          <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
-                            <input id="domains" type="text" class="form-control" name="domains" placeholder="domain1.com;domain2.com" required>
-                          </div>
-                          <div class="text-success" id="stat"><strong>correctly locked</strong></div>
-                          <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-lock"></span>&nbsp;Lock</button>
-                          <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-lock"></span>&nbsp;UnLock</button>
-                        </form>
+    <!-- common -->
+    <div class="container" align="center">
+        <h4 class="text-center text-primary">Stream Locking <span class="visible-xs"><small>(luztv)</small></span></h4>
+        <div>
+            <div class="row">
+                <div class="col-xs-1 col-sm-4">&nbsp;</div>
+                <div class="col-xs-10 col-sm-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            Lock stream to domain(s)
+                        </div>
+                        <div class="panel-body">
+                            <form>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon  glyphicon-film"></i></span>
+                                    <input id="stream" type="text" class="form-control" name="stream" placeholder="streamname" required autofocus>
+                                </div><br/>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
+                                    <input id="domains" type="text" class="form-control" name="domains" placeholder="domain1.com;domain2.com" required>
+                                </div>
+                                <div class="text-success" id="stat"><strong>correctly locked</strong></div>
+                                <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-lock"></span>&nbsp;Lock</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
+                <div class="col-xs-1 col-sm-4">&nbsp;</div>
             </div>
-            <div class="col-xs-1 col-sm-4">&nbsp;</div>
         </div>
     </div>
-</div>    
+
+    <!-- table -->
+    <div class="container">
+        <table class="table table-hover table-condensed">
+            <thead class="bg-primary">
+                <tr class="row">
+                    <th class="col-4">Stream</th><!-- 12 chars -->
+                    <th class="col-7">Domains</th><!-- 24 chars -->
+                    <th class="col-1">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="row">
+                    <td class="col-4">livestream</td>
+                    <td class="col-7">www.todostreaming.es</td>
+                    <td class="col-1"><button type="button" class="btn btn-danger btn-xs" title='Press to unlock' onclick='load(%d)'><span class="glyphicon glyphicon-lock"></span></button></td>
+                </tr>
+                <tr class="row">
+                    <td class="col-4">livestream</td>
+                    <td class="col-7">www.todostreaming.es</td>
+                    <td class="col-1"><button type="button" class="btn btn-danger btn-xs" title='Press to unlock' onclick='load(%d)'><span class="glyphicon glyphicon-lock"></span></button></td>
+                </tr>
+                <tr class="row">
+                    <td class="col-4">abcdghjfyted</td>
+                    <td class="col-7">abchdxcvfghtsxcvfsrfgtfs</td>
+                    <td class="col-1"><button type="button" class="btn btn-danger btn-xs" title='Press to unlock' onclick='load(%d)'><span class="glyphicon glyphicon-lock"></span></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 </body>
+
 </html>

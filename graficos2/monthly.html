@@ -57,54 +57,553 @@
     <div class="container" align="center">
         <h4 class="text-center">Stats corresponding to 2017/05 <span class="visible-xs"><small>(luztv)</small></span></h4>
         <div>
-            <form class="form-inline">
+            <form class="form-inline" method="post" action="" id="testform">
                 <div class="form-group">
-                    <select class="form-control" id="month" name="month">
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
+                    <select class="form-control" id="months" name="months">
             </select>
                 </div>
                 <div class="form-group">
-                    <select class="form-control" id="year" name="year">
-                <option value="2016">2016</option>
-                <option value="2017">2017</option>
-                <option value="2018">2018</option>
+                    <select class="form-control" id="years" name="years">
             </select>
                 </div>
                 <div class="form-group">
                     <select class="form-control" id="stream" name="stream">
-                <option value="todo">All</option>
-                <option value="livestream">livestream</option>
-                <option value="mystream">mystream</option>
             </select>
                 </div>
             </form>
         </div>
         <br/>
-        <div>
-            <p class="text-primary"><strong>Hours consumed: </strong>9002<br/>
+        <div id="totalMonth">
+            
+               <p class="text-primary"><strong>Hours consumed: </strong>9002<br/>
                 <strong>GBs consumed: </strong>5716</p>
         </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="panel1">
         <div>
             <br/>
             <div class="row">
-                <div class="col-sm-6" style="background-color:lavender;">&nbsp;</div>
-                <div class="col-sm-6" style="background-color:lavenderblush;">&nbsp;</div>
+                <div class="col-sm-6">
+                    <label>Audience in Players</label>
+                    <canvas id='grafico1'></canvas>
+                </div>
+                <div class="col-sm-6">
+                    <label>Hours of Playback</label>
+                    <canvas id='grafico2'></canvas>
+                </div>
             </div>
             <div class="row">
-                <div class="col-sm-6" style="background-color:lavender;">&nbsp;</div>
-                <div class="col-sm-6" style="background-color:lavenderblush;">&nbsp;</div>
+                <div class="col-sm-6">
+                    <label>Average Time of Playback (hours)</label>
+                    <canvas id='grafico3'></canvas>
+                </div>
+                <div class="col-sm-6" style="background-color:lavenderblush;">
+                    <label>Traffic in Gigabytes</label>
+                    <canvas id='grafico4'></canvas>
+                </div>
             </div>
             <div class="row">
-                <div class="col-sm-6" style="background-color:lavender;">&nbsp;</div>
-                <div class="col-sm-6" style="background-color:lavenderblush;">&nbsp;</div>
+                <div class="col-sm-6" style="background-color:lavender;">
+                    <label>Max Audience in Players</label>
+                    <canvas id='grafico5'></canvas>
+                </div>
+                <div class="col-sm-6" style="background-color:lavenderblush;">
+                    <label>Peak Times</label>
+                    <canvas id='grafico6'></canvas>
+                </div>
             </div>
         </div>
     </div>
+
+       <div class="container" id="panel">
+        <div>
+            <br/>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div id='graf1' align='center'></div>
+                </div>
+                <div class="col-sm-6">
+                    <div id='graf2' align='center'></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div id='graf3' align='center'></div>
+                </div>
+                <div class="col-sm-6" style="background-color:lavenderblush;">
+                    <div id='graf4' align='center'></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6" style="background-color:lavender;">
+                    <div id='graf5' align='center'></div>
+                </div>
+                <div class="col-sm-6" style="background-color:lavenderblush;">
+                    <div id='graf6' align='center'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function autologout() {
+            $.post("/autologout.cgi", function(data, status) {});
+        }
+        $(document).ready(function() {
+            setInterval("autologout()", 20000);
+            //SE GENERA EL FORMULARIO
+            $.post("/getMonthsYears.cgi", function(data, status) {
+                var res = data.trim().split(";");
+                $("#months").html(res[0]);
+                $("#years").html(res[1]);
+                $("#stream").html(res[2]);
+            });
+            //TOTALES CONSUMIDOS
+            $.post("/totalMonths.cgi", function(data, status) {
+                $("#totalMonth").html(data);
+            });
+            //MUESTRA LOS DATOS EN LA PRIMERA RECARGA
+            $.post("/firstMonthly.cgi", $("#testform").serialize(), function(data, status) {
+                var data = data.split(";");
+                $("#stream").html(data[6]);
+                //AUDIENCIA TOTAL DEL DIA POR PERSONAS
+                var parser1 = $.parseJSON(data[0]);
+                var audiencias = $("#grafico1");
+                var grafo1 = new Chart(audiencias, {
+                    type: parser1.type,
+                    data: {
+                        labels: parser1.labels,
+                        datasets: [{
+                            label: "players",
+                            backgroundColor: "rgba(67, 196, 54, 0.2)",
+                            borderColor: "rgba(67, 196, 54, 1)",
+                            borderWidth: 1,
+                            hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                            hoverBorderColor: "rgba(67, 196, 54, 1)",
+                            data: parser1.data,
+                        }]
+                    }
+                });
+                //TIEMPO TOTAL VISIONADO
+                var parser2 = $.parseJSON(data[1]);
+                var total_min = $("#grafico2");
+                var grafo2 = new Chart(total_min, {
+                    type: parser2.type,
+                    data: {
+                        labels: parser2.labels,
+                        datasets: [{
+                            label: "hours",
+                            backgroundColor: "rgba(67, 196, 54, 0.2)",
+                            borderColor: "rgba(67, 196, 54, 1)",
+                            borderWidth: 1,
+                            hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                            hoverBorderColor: "rgba(67, 196, 54, 1)",
+                            data: parser2.data,
+                        }]
+                    }
+                });
+                //TIEMPO MEDIO VISIONADO EN HORAS
+                var parser3 = $.parseJSON(data[2]);
+                var promedio = $("#grafico3");
+                var grafo3 = new Chart(promedio, {
+                    type: parser3.type,
+                    data: {
+                        labels: parser3.labels,
+                        datasets: [{
+                            label: "hours",
+                            backgroundColor: "rgba(67, 196, 54, 0.2)",
+                            borderColor: "rgba(67, 196, 54, 1)",
+                            borderWidth: 1,
+                            hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                            hoverBorderColor: "rgba(67, 196, 54, 1)",
+                            data: parser3.data,
+                        }]
+                    }
+                });
+                //TRAFICO DIARIO EN GIGABYTES
+                var parser4 = $.parseJSON(data[3]);
+                var megas = $("#grafico4");
+                var grafo4 = new Chart(megas, {
+                    type: parser4.type,
+                    data: {
+                        labels: parser4.labels,
+                        datasets: [{
+                            label: "GB",
+                            backgroundColor: "rgba(67, 196, 54, 0.2)",
+                            borderColor: "rgba(67, 196, 54, 1)",
+                            borderWidth: 1,
+                            hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                            hoverBorderColor: "rgba(67, 196, 54, 1)",
+                            data: parser4.data,
+                        }]
+                    }
+                });
+                //MAXIMO DE SIMULTANEOS EN PERSONAS
+                var parser5 = $.parseJSON(data[4]);
+                var maximo = $("#grafico5");
+                var grafo5 = new Chart(maximo, {
+                    type: parser5.type,
+                    data: {
+                        labels: parser5.labels,
+                        datasets: [{
+                            label: "players",
+                            backgroundColor: "rgba(67, 196, 54, 0.2)",
+                            borderColor: "rgba(67, 196, 54, 1)",
+                            borderWidth: 1,
+                            hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                            hoverBorderColor: "rgba(67, 196, 54, 1)",
+                            data: parser5.data,
+                        }]
+                    }
+                });
+                //HORA DEL PICO DE AUDIENCIA
+                var parser6 = $.parseJSON(data[5]);
+                var horaPico = $("#grafico6");
+                var grafo6 = new Chart(horaPico, {
+                    type: parser6.type,
+                    data: {
+                        labels: parser6.labels,
+                        datasets: [{
+                            label: "hours",
+                            backgroundColor: "rgba(67, 196, 54, 0.2)",
+                            borderColor: "rgba(67, 196, 54, 1)",
+                            borderWidth: 1,
+                            hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                            hoverBorderColor: "rgba(67, 196, 54, 1)",
+                            data: parser6.data,
+                        }]
+                    }
+                });
+            });
+            //MUESTRA LOS DATOS DE LOS SELECTS
+            $("#months, #years, #stream").change(function() {
+                $("#panel1").hide();
+                $.post("/createGraf.cgi", function(data, status) {
+                    var graf = data.split(";");
+                    $("#graf1").html(graf[0]);
+                    $("#graf2").html(graf[1]);
+                    $("#graf3").html(graf[2]);
+                    $("#graf4").html(graf[3]);
+                    $("#graf5").html(graf[4]);
+                    $("#graf6").html(graf[5]);
+                });
+                $.post("/totalMonthsChange.cgi", $("#testform").serialize(), function(data, status) {
+                    if (data == "NoBD") {
+                        $("#totalMonth").html("");
+                    } else {
+                        $("#totalMonth").html(data);
+                    }
+                });
+                $.post("/graficosMonthly.cgi", $("#testform").serialize(), function(data, status) {
+                    var data = data.split(";");
+                    $("#stream").html(data[6]);
+                    //AUDIENCIA TOTAL DEL DIA POR PERSONAS
+                    var parser1 = $.parseJSON(data[0]);
+                    var audiencias = $("#graficop1");
+                    if (jQuery.isEmptyObject(parser1.data)) {
+                        var grafo1 = new Chart(audiencias, {
+                            type: parser1.type,
+                            data: {
+                                labels: parser1.labels,
+                                datasets: [{
+                                    label: "players",
+                                    backgroundColor: "rgba(255, 59, 64,0.2)",
+                                    borderColor: "rgba(255, 59, 64, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(255, 59, 64, 0.4)",
+                                    hoverBorderColor: "rgba(255, 59, 64, 1)",
+                                    data: [],
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    } else {
+                        var grafo1 = new Chart(audiencias, {
+                            type: parser1.type,
+                            data: {
+                                labels: parser1.labels,
+                                datasets: [{
+                                    label: "players",
+                                    backgroundColor: "rgba(67, 196, 54, 0.2)",
+                                    borderColor: "rgba(67, 196, 54, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                                    hoverBorderColor: "rgba(67, 196, 54, 1)",
+                                    data: parser1.data,
+                                }]
+                            }
+                        });
+                    }
+                    //TIEMPO TOTAL VISIONADO
+                    var parser2 = $.parseJSON(data[1]);
+                    var total_min = $("#graficop2");
+                    if (jQuery.isEmptyObject(parser2.data)) {
+                        var grafo2 = new Chart(total_min, {
+                            type: parser2.type,
+                            data: {
+                                labels: parser2.labels,
+                                datasets: [{
+                                    label: "hours",
+                                    backgroundColor: "rgba(255, 59, 64,0.2)",
+                                    borderColor: "rgba(255, 59, 64, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(255, 59, 64, 0.4)",
+                                    hoverBorderColor: "rgba(255, 59, 64, 1)",
+                                    data: [],
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    } else {
+                        var grafo2 = new Chart(total_min, {
+                            type: parser2.type,
+                            data: {
+                                labels: parser2.labels,
+                                datasets: [{
+                                    label: "hours",
+                                    backgroundColor: "rgba(67, 196, 54, 0.2)",
+                                    borderColor: "rgba(67, 196, 54, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                                    hoverBorderColor: "rgba(67, 196, 54, 1)",
+                                    data: parser2.data,
+                                }]
+                            }
+                        });
+                    }
+                    //TIEMPO MEDIO VISIONADO EN MINUTOS
+                    var parser3 = $.parseJSON(data[2]);
+                    var promedio = $("#graficop3");
+                    if (jQuery.isEmptyObject(parser3.data)) {
+                        var grafo3 = new Chart(promedio, {
+                            type: parser3.type,
+                            data: {
+                                labels: parser3.labels,
+                                datasets: [{
+                                    label: "hours",
+                                    backgroundColor: "rgba(255, 59, 64,0.2)",
+                                    borderColor: "rgba(255, 59, 64, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(255, 59, 64, 0.4)",
+                                    hoverBorderColor: "rgba(255, 59, 64, 1)",
+                                    data: [],
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    } else {
+                        var grafo3 = new Chart(promedio, {
+                            type: parser3.type,
+                            data: {
+                                labels: parser3.labels,
+                                datasets: [{
+                                    label: "hours",
+                                    backgroundColor: "rgba(67, 196, 54, 0.2)",
+                                    borderColor: "rgba(67, 196, 54, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                                    hoverBorderColor: "rgba(67, 196, 54, 1)",
+                                    data: parser3.data,
+                                }]
+                            }
+                        });
+                    }
+                    //TRAFICO DIARIO EN MEGABYTES
+                    var parser4 = $.parseJSON(data[3]);
+                    var megas = $("#graficop4");
+                    if (jQuery.isEmptyObject(parser4.data)) {
+                        var grafo4 = new Chart(megas, {
+                            type: parser4.type,
+                            data: {
+                                labels: parser4.labels,
+                                datasets: [{
+                                    label: "GB",
+                                    backgroundColor: "rgba(255, 59, 64,0.2)",
+                                    borderColor: "rgba(255, 59, 64, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(255, 59, 64, 0.4)",
+                                    hoverBorderColor: "rgba(255, 59, 64, 1)",
+                                    data: [],
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    } else {
+                        var grafo4 = new Chart(megas, {
+                            type: parser4.type,
+                            data: {
+                                labels: parser4.labels,
+                                datasets: [{
+                                    label: "GB",
+                                    backgroundColor: "rgba(67, 196, 54, 0.2)",
+                                    borderColor: "rgba(67, 196, 54, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                                    hoverBorderColor: "rgba(67, 196, 54, 1)",
+                                    data: parser4.data,
+                                }]
+                            }
+                        });
+                    }
+                    //MAXIMO DE SIMULTANEOS EN PERSONAS
+                    var parser5 = $.parseJSON(data[4]);
+                    var maximo = $("#graficop5");
+                    if (jQuery.isEmptyObject(parser5.data)) {
+                        var grafo5 = new Chart(maximo, {
+                            type: parser5.type,
+                            data: {
+                                labels: parser5.labels,
+                                datasets: [{
+                                    label: "players",
+                                    backgroundColor: "rgba(255, 59, 64,0.2)",
+                                    borderColor: "rgba(255, 59, 64, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(255, 59, 64, 0.4)",
+                                    hoverBorderColor: "rgba(255, 59, 64, 1)",
+                                    data: [],
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    } else {
+                        var grafo5 = new Chart(maximo, {
+                            type: parser5.type,
+                            data: {
+                                labels: parser5.labels,
+                                datasets: [{
+                                    label: "players",
+                                    backgroundColor: "rgba(67, 196, 54, 0.2)",
+                                    borderColor: "rgba(67, 196, 54, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                                    hoverBorderColor: "rgba(67, 196, 54, 1)",
+                                    data: parser5.data,
+                                }]
+                            }
+                        });
+                    }
+                    //HORA DEL PICO DE AUDIENCIA
+                    var parser6 = $.parseJSON(data[5]);
+                    var horaPico = $("#graficop6");
+                    if (jQuery.isEmptyObject(parser6.data)) {
+                        var grafo6 = new Chart(horaPico, {
+                            type: parser6.type,
+                            data: {
+                                labels: parser6.labels,
+                                datasets: [{
+                                    label: "hours",
+                                    backgroundColor: "rgba(255, 59, 64,0.2)",
+                                    borderColor: "rgba(255, 59, 64, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(255, 59, 64, 0.4)",
+                                    hoverBorderColor: "rgba(255, 59, 64, 1)",
+                                    data: [],
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    } else {
+                        var grafo6 = new Chart(horaPico, {
+                            type: parser6.type,
+                            data: {
+                                labels: parser6.labels,
+                                datasets: [{
+                                    label: "hours",
+                                    backgroundColor: "rgba(67, 196, 54, 0.2)",
+                                    borderColor: "rgba(67, 196, 54, 1)",
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: "rgba(67, 196, 54, 0.4)",
+                                    hoverBorderColor: "rgba(67, 196, 54, 1)",
+                                    data: parser6.data,
+                                }]
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+    </script>
+
 
 </body>
 

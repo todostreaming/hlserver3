@@ -51,10 +51,10 @@ func editar_cliente(w http.ResponseWriter, r *http.Request) {
 			Error.Println(err)
 			return
 		}
-		fmt.Fprintf(w, "<div class='form-group text-success'>%s</div>", good)
+		fmt.Fprintf(w, "<div class=\"text-success\"><strong>%s</strong></div>", good)
 	} else {
 		bad := "Passwords do not coincide"
-		fmt.Fprintf(w, "<div class='form-group text-danger'>%s</div>", bad)
+		fmt.Fprintf(w, "<div class=\"text-danger\"><strong>%s</strong></div>", bad)
 	}
 }
 
@@ -101,10 +101,10 @@ func editar_publish(w http.ResponseWriter, r *http.Request) {
 			Error.Println(err)
 			return
 		}
-		fmt.Fprintf(w, "<div class='form-group text-success'>%s</div>", good)
+		fmt.Fprintf(w, "<div class=\"text-success\"><strong>%s</strong></div>", good)
 	} else {
 		bad := "Passwords do not coincide"
-		fmt.Fprintf(w, "<div class='form-group text-danger'>%s</div>", bad)
+		fmt.Fprintf(w, "<div class=\"text-danger\"><strong>%s</strong></div>", bad)
 	}
 }
 
@@ -133,5 +133,5 @@ func user_admin(w http.ResponseWriter, r *http.Request) {
 	mu_user.Unlock()
 	// ---- end of session identification -------------------------------
 
-	fmt.Fprintf(w, "<input class='form-control' placeholder='Usuario' readonly='readonly' name='username' type='username' value='%s' autofocus>", user)
+	fmt.Fprintf(w, "<span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-user\"></i></span><input class='form-control' placeholder='Usuario' readonly='readonly' name='username' type='username' value='%s' autofocus>", user)
 }

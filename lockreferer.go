@@ -41,7 +41,7 @@ func listlocks(w http.ResponseWriter, r *http.Request) {
 	}
 	defer dbgeneral.Close()
 
-	table := "<tr><th>Stream</th><th>Domains</th><th>&nbsp;</th></tr>"
+	table := "<table class=\"table table-hover table-condensed\"><thead class=\"bg-primary\"><tr class=\"row\"><th class=\"col-4\">Stream</th><th class=\"col-7\">Domains</th><th class=\"col-1\">&nbsp;</th></tr></thead><tbody>"
 	dbgen_mu.RLock()
 	query, err := dbgeneral.Query("SELECT id, streamname, referrers FROM referer WHERE username = ?", username)
 	dbgen_mu.RUnlock()
@@ -53,10 +53,10 @@ func listlocks(w http.ResponseWriter, r *http.Request) {
 		var stream, refer string
 		var id int
 		query.Scan(&id, &stream, &refer)
-		table += fmt.Sprintf("<tr><td>%s</td><td>%d</td><td><button href='#' title='Press to change the status' onclick='load(%d)'>delete</button></td></tr>", stream, refer[0:80], id)
+		table = table + fmt.Sprintf("<tr class=\"row\"><td class=\"col-4\">livestream</td><td class=\"col-7\">www.todostreaming.es</td><td class=\"col-1\"><button type=\"button\" class=\"btn btn-danger btn-xs\" title='Press to unlock' onclick='load(%d)'><span class=\"glyphicon glyphicon-lock\"></span></button></td></tr>", stream[0:11], refer[0:23], id)
 	}
 	query.Close()
-	fmt.Fprintf(w, "%s", table)
+	fmt.Fprintf(w, "%s", table+"</tbody></table></div>")
 }
 
 func add_referrer(w http.ResponseWriter, r *http.Request) {

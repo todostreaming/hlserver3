@@ -68,11 +68,11 @@
         <div class="row">
             <div class="col-xs-2 col-sm-4 col-md-5">&nbsp;</div>
             <div class="col-xs-8 col-sm-4 col-md-2">
-                <form>
+                <form id="testform" action="">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Date" name="fecha" id="popup_container">
                         <div class="input-group-btn">
-                            <button class="btn btn-primary" type="submit">
+                            <button class="btn btn-primary" type="submit" id="consulta">
                 <i class="glyphicon glyphicon-search"></i>
               </button>
                         </div>
@@ -83,77 +83,338 @@
         </div>
     </div>
 
-    <!-- tables for mobiles -->
-    <div class="container">
-        <div class="visible-xs">
-            <h5 class="text-center text-primary"><strong>Players per Hours</strong></h5>
-            <table class="table table-hover table-condensed">
-                <thead class="bg-primary">
-                    <tr class="row">
-                        <th class="col-xs-2">Hour</th>
-                        <th class="col-xs-5">Players</th>
-                        <th class="col-xs-5">Minutes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="row">
-                        <td class="col-xs-2">1:00</td>
-                        <td class="col-xs-5">5</td>
-                        <td class="col-xs-5">210</td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-xs-2">2:00</td>
-                        <td class="col-xs-5">50</td>
-                        <td class="col-xs-5">1560</td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-xs-2">3:00</td>
-                        <td class="col-xs-5">145</td>
-                        <td class="col-xs-5">3625</td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-xs-2">4:00</td>
-                        <td class="col-xs-5">145900</td>
-                        <td class="col-xs-5">8754000</td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-xs-2">5:00</td>
-                        <td class="col-xs-5">0</td>
-                        <td class="col-xs-5">0</td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-xs-2">6:00</td>
-                        <td class="col-xs-5">0</td>
-                        <td class="col-xs-5">0</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div id="zonaGraficos">
+        <!-- graphics for tablets and above (when loaded the 1st time) -->
+        <div class="container" id="firstTime">
+            <div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-10">
+                        <div align="center">
+                            <h3>Players per Hours</h3>
+                            <canvas id="sessHour"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">&nbsp;</div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-10">
+                        <div class="row text-center">
+                            <h3>Operating Systems</h3>
+                            <div class="col-sm-6 text-center">
+                                <label>Number of Players</label>
+                                <canvas id="sesSo"></canvas>
+                            </div>
+                            <div class="col-sm-6 text-center">
+                                <label>Seconds Playing</label>
+                                <canvas id="timeSo"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">&nbsp;</div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-10">
+                        <div class="row text-center">
+                            <h3>Countries</h3>
+                            <div class="col-sm-6 text-center">
+                                <label>Seconds per Country</label>
+                                <canvas id="timeIso"></canvas>
+                            </div>
+                            <div class="col-sm-6 text-center">
+                                <label>Players per Country</label>
+                                <canvas id="sessIso"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- graphics for tablets and above (when loaded when date selected) -->
+        <div class="container">
+            <div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-10">
+                        <div align="center">
+                            <div id="canv1"></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">&nbsp;</div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-10">
+                        <div class="row text-center">
+                            <div id="title"></div>
+                            <div class="col-sm-6 text-center">
+                                <div id="canv2"></div>
+                            </div>
+                            <div class="col-sm-6 text-center">
+                                <div id="canv3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">&nbsp;</div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-10">
+                        <div class="row text-center">
+                            <div id="title2"></div>
+                            <div class="col-sm-6 text-center">
+                                <div id="canv4"></div>
+                            </div>
+                            <div class="col-sm-6 text-center">
+                                <div id="canv5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">&nbsp;</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- graphics for tablets and above -->
-    <div class="container">
-        <div class="hidden-xs">
-            <br/>
-            <div class="row">
-                <div class="col-sm-1">&nbsp;</div>
-                <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
-                <div class="col-sm-1">&nbsp;</div>
-            </div>
-            <br/>
-            <div class="row">
-                <div class="col-sm-1">&nbsp;</div>
-                <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
-                <div class="col-sm-1">&nbsp;</div>
-            </div>
-            <br/>
-            <div class="row">
-                <div class="col-sm-1">&nbsp;</div>
-                <div class="col-sm-10" style="background-color:lavender;">&nbsp;</div>
-                <div class="col-sm-1">&nbsp;</div>
-            </div>
-        </div>
-    </div>
+    <script type="text/javascript">
+        function autologout() {
+            $.post("/autologout.cgi", function(data, status) {});
+        }
+        $(document).ready(function() {
+            setInterval("autologout()", 20000);
+            $("#zonaGraficos").hide();
+            //CUANDO SE RECARGA
+            $.post("/giveFecha.cgi", function(data, status) {
+                $.each(data.split('&'), function(index, elem) {
+                    var vals = elem.split('=');
+                    $("[name=\"" + vals[0].trim() + "\"]").val(decodeURIComponent(vals[1].replace("+", ' ')));
+                });
+            });
+            $.post("/zeroFields.cgi", function(data, status) {
+                if (data == "Nada") {
+                    //No existe ningun valor
+                    $("#zonaGraficos").hide();
+                }
+                if (data == "Hay") {
+                    //Existe valor
+                    $("#zonaGraficos").show();
+                    $("#fechaActual").show();
+                    $("#firstTime").show();
+                    $.post("/firstFecha.cgi", function(data, status) {
+                        var data = data.split(";")
+                        $("#fechaActual").html(data[0]);
+                        //Segundos consumidos por Sistema Operativo
+                        var parser1 = $.parseJSON(data[1]);
+                        var timeSo = document.getElementById("timeSo");
+                        var grafo1 = new Chart(timeSo, {
+                            type: parser1.type,
+                            data: {
+                                labels: parser1.labels,
+                                datasets: [{
+                                    data: parser1.data,
+                                    backgroundColor: parser1.colores,
+                                    hoverBackgroundColor: parser1.colores
+                                }]
+                            }
+                        });
+                        //Sesiones por sistema operativo
+                        var parser2 = $.parseJSON(data[2]);
+                        var sesSo = document.getElementById("sesSo");
+                        var grafo2 = new Chart(sesSo, {
+                            type: parser2.type,
+                            data: {
+                                labels: parser2.labels,
+                                datasets: [{
+                                    data: parser2.data,
+                                    backgroundColor: parser2.colores,
+                                    hoverBackgroundColor: parser2.colores
+                                }]
+                            }
+                        });
+                        //Segundos consumidos por país
+                        var parser3 = $.parseJSON(data[3]);
+                        var timeIso = document.getElementById("timeIso");
+                        var grafo3 = new Chart(timeIso, {
+                            type: parser3.type,
+                            data: {
+                                labels: parser3.labels,
+                                datasets: [{
+                                    data: parser3.data,
+                                    backgroundColor: parser3.colores,
+                                    hoverBackgroundColor: parser3.colores
+                                }]
+                            }
+                        });
+                        //Sesiones por país
+                        var parser4 = $.parseJSON(data[4]);
+                        var sessIso = document.getElementById("sessIso");
+                        var grafo4 = new Chart(sessIso, {
+                            type: parser4.type,
+                            data: {
+                                labels: parser4.labels,
+                                datasets: [{
+                                    data: parser4.data,
+                                    backgroundColor: parser4.colores,
+                                    hoverBackgroundColor: parser4.colores
+                                }]
+                            }
+                        });
+                        //Sesiones por franja horaria
+                        var parser5 = $.parseJSON(data[5]);
+                        var sessHour = document.getElementById("sessHour");
+                        var grafo5 = new Chart(sessHour, {
+                            type: parser5.type,
+                            data: {
+                                labels: parser5.labels,
+                                datasets: [{
+                                    label: "num. of players",
+                                    fill: false,
+                                    lineTension: 0.1,
+                                    backgroundColor: "rgba(75,192,192,0.4)",
+                                    borderColor: "rgba(75,192,192,1)",
+                                    borderCapStyle: 'butt',
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: "rgba(75,192,192,1)",
+                                    pointBackgroundColor: "#fff",
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 5,
+                                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 1,
+                                    pointHitRadius: 10,
+                                    data: parser5.data,
+                                }]
+                            }
+                        });
+                    });
+                }
+            });
+            //CUANDO SE OBTIENE UNA FECHA DEL SELECT
+            $("#consulta").click(function() {
+                $("#firstTime").hide();
+                $("#fechaActual").hide();
+                $.post("/formatDaylyhtml.cgi", function(data, status) {
+                    var data = data.split(";")
+                    $("#canv1").html(data[0]);
+                    $("#title").html(data[1]);
+                    $("#canv2").html(data[2]);
+                    $("#canv3").html(data[3]);
+                    $("#title2").html(data[4]);
+                    $("#canv4").html(data[5]);
+                    $("#canv5").html(data[6]);
+                });
+                $.post("/consultaFecha.cgi", $("#testform").serialize(), function(data, status) {
+                    if (data == "NoBD") {
+                        $("#zonaGraficos").hide();
+                    } else {
+                        $("#zonaGraficos").show();
+                        var data = data.split(";")
+                        $("#fechaSelect").html(data[0]);
+                        //Segundos consumidos por Sistema Operativo
+                        var parser1 = $.parseJSON(data[1]);
+                        var selGraf1 = document.getElementById("selGraf1");
+                        var grafo1 = new Chart(selGraf1, {
+                            type: parser1.type,
+                            data: {
+                                labels: parser1.labels,
+                                datasets: [{
+                                    data: parser1.data,
+                                    backgroundColor: parser1.colores,
+                                    hoverBackgroundColor: parser1.colores
+                                }]
+                            }
+                        });
+                        //Sesiones por sistema operativo
+                        var parser2 = $.parseJSON(data[2]);
+                        var selGraf2 = document.getElementById("selGraf2");
+                        var grafo2 = new Chart(selGraf2, {
+                            type: parser2.type,
+                            data: {
+                                labels: parser2.labels,
+                                datasets: [{
+                                    data: parser2.data,
+                                    backgroundColor: parser2.colores,
+                                    hoverBackgroundColor: parser2.colores
+                                }]
+                            }
+                        });
+                        //Segundos consumidos por país
+                        var parser3 = $.parseJSON(data[3]);
+                        var selGraf3 = document.getElementById("selGraf3");
+                        var grafo3 = new Chart(selGraf3, {
+                            type: parser3.type,
+                            data: {
+                                labels: parser3.labels,
+                                datasets: [{
+                                    data: parser3.data,
+                                    backgroundColor: parser3.colores,
+                                    hoverBackgroundColor: parser3.colores
+                                }]
+                            }
+                        });
+                        //Sesiones por país
+                        var parser4 = $.parseJSON(data[4]);
+                        var selGraf4 = document.getElementById("selGraf4");
+                        var grafo4 = new Chart(selGraf4, {
+                            type: parser4.type,
+                            data: {
+                                labels: parser4.labels,
+                                datasets: [{
+                                    data: parser4.data,
+                                    backgroundColor: parser4.colores,
+                                    hoverBackgroundColor: parser4.colores
+                                }]
+                            }
+                        });
+                        //Sesiones por franja horaria
+                        var parser5 = $.parseJSON(data[5]);
+                        var selGraf5 = document.getElementById("selGraf5");
+                        var grafo5 = new Chart(selGraf5, {
+                            type: parser5.type,
+                            data: {
+                                labels: parser5.labels,
+                                datasets: [{
+                                    label: "num. of players",
+                                    fill: false,
+                                    lineTension: 0.1,
+                                    backgroundColor: "rgba(75,192,192,0.4)",
+                                    borderColor: "rgba(75,192,192,1)",
+                                    borderCapStyle: 'butt',
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: "rgba(75,192,192,1)",
+                                    pointBackgroundColor: "#fff",
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 5,
+                                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 1,
+                                    pointHitRadius: 10,
+                                    data: parser5.data,
+                                }]
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+    </script>
 
 </body>
 
