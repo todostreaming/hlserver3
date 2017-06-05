@@ -54,7 +54,7 @@
 
     <!-- common -->
     <div class="container" align="center">
-        <h4 class="text-center text-primary">Stream Locking <span class="visible-xs"><small>(luztv)</small></span></h4>
+        <h4 class="text-center text-primary">Stream Locking <span class="visible-xs"><small>(<div id="username1"></div>)</small></span></h4>
         <div>
             <div class="row">
                 <div class="col-xs-1 col-sm-4">&nbsp;</div>
@@ -93,6 +93,10 @@
             $.post("/autologout.cgi", function(data, status) {});
         }
         $(document).ready(function() {
+            $.post("/username.cgi", function(data, status) {
+                $("#username").html(data);
+                $("#username1").html(data);
+            });
             setInterval("autologout()", 20000);
             $.post("/listlocks.cgi", function(data, status) {
                 $("#campos").html(data);

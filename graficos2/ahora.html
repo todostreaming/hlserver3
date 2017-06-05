@@ -65,6 +65,9 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
+            $.post("/username.cgi", function(data, status) {
+                $("#username").html(data);
+            });
             $.post("/encoderStatNow.cgi", function(data, status) {
                 $("#encoders").html(data);
             });
