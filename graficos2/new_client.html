@@ -2,134 +2,134 @@
 <html lang="en">
 
 <head>
-    <title>Streaming Control Panel</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+	<title>Streaming Control Panel</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 </head>
 
 <body style="padding-top: 70px;">
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="sr-only">Change navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-                <a class="navbar-brand" href="#">HLServer 3.0</a>
-            </div>
-            <div class="collapse navbar-collapse" id="myNavbar">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown active">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Clients <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li class="active"><a href="new_client.html">New Client</a></li>
-                            <li><a href="del_client.html">Delete Client</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="monthly_admin.html">Stats</a></li>
-                    <li><a href="hardware.html">Hardware</a></li>
-                    <li><a href="editarAdmin.html">Password</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="hidden-xs">
-                        <p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span></p>
-                    </li>
-                    <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+				<a class="navbar-brand" href="#">HLServer 3.0</a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul class="nav navbar-nav">
+					<li class="dropdown active">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Clients <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li class="active"><a href="new_client.html">New Client</a></li>
+							<li><a href="del_client.html">Delete Client</a></li>
+						</ul>
+					</li>
+					<li><a href="monthly_admin.html">Stats</a></li>
+					<li><a href="hardware.html">Hardware</a></li>
+					<li><a href="editarAdmin.html">Password</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li class="hidden-xs">
+						<p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span></p>
+					</li>
+					<li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-    <!-- common -->
-    <div class="container">
-        <h4 class="text-center text-primary">Register a New Customer <span class="visible-xs"><small>(<div id="username1"></div>)</small></span></h4>
-        <div>
-            <div class="row">
-                <div class="col-xs-1 col-sm-4">&nbsp;</div>
-                <div class="col-xs-10 col-sm-4">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading text-center">
-                            enter your customer's data
-                        </div>
-                        <div class="panel-body">
-                            <form id="testform" action="" method="post">
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                    <input id="nom_cli" type="text" class="form-control" name="nom_cli" placeholder="Username" required autofocus>
-                                </div><br/>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                                    <input id="passw" type="password" class="form-control" name="passw" placeholder="Password" required>
-                                </div><br/>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-tags"></i></span>
-                                    <select class="form-control" name="type" id="type">
+	<!-- common -->
+	<div class="container">
+		<h4 class="text-center text-primary">Register a New Customer <span class="visible-xs"><small>(<div id="username1"></div>)</small></span></h4>
+		<div>
+			<div class="row">
+				<div class="col-xs-1 col-sm-4">&nbsp;</div>
+				<div class="col-xs-10 col-sm-4">
+					<div class="panel panel-primary">
+						<div class="panel-heading text-center">
+							enter your customer's data
+						</div>
+						<div class="panel-body">
+							<form id="testform" action="" method="post">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+									<input id="nom_cli" type="text" class="form-control" name="nom_cli" placeholder="Username" required autofocus>
+								</div><br/>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+									<input id="passw" type="password" class="form-control" name="passw" placeholder="Password" required>
+								</div><br/>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-tags"></i></span>
+									<select class="form-control" name="type" id="type">
                             </select>
-                                </div><br/>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-off"></i></span>
-                                    <select class="form-control" name="status" id="status">
+								</div><br/>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-off"></i></span>
+									<select class="form-control" name="status" id="status">
                                          <option value="0">disabled</option>
                                         <option value="1" selected>enabled</option>
                            </select>
-                                </div>
-                                <div class="text-success" id="stat" align="center"><strong>correctly changed</strong><br/>
-                                    <button type="submit" class="btn btn-primary" name="enviar" id="enviar">Register</button></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-1 col-sm-4">&nbsp;</div>
-            </div>
-        </div>
-    </div>
+								</div>
+								<div class="text-success" id="stat" align="center"><strong>correctly changed</strong><br/>
+									<button type="submit" class="btn btn-primary" name="enviar" id="enviar">Register</button></div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-1 col-sm-4">&nbsp;</div>
+			</div>
+		</div>
+	</div>
 
-    <script type="text/javascript">
-        function autologout() {
-            $.post("/autologout.cgi", function(data, status) {});
-        }
-        $(document).ready(function() {
-            $.post("/username.cgi", function(data, status) {
-                $("#username").html(data);
-                $("#username1").html(data);
-            });
-            setInterval("autologout()", 20000);
-            $.get("/types.cgi", function(data, status) {
-                $("#type").html(data);
-            });
-            $("#enviar").click(function() {
-                $.post("/username.cgi", function(data, status) {
-                    $("#username").html(data);
-                    $("#username1").html(data);
-                });
-                $.post("/nuevoCliente.cgi", $("#testform").serialize(), function(data, status) {
-                    $("#nom_cli").val("");
-                    $("#passw").val("");
-                    $("#status").val(1);
-                    switch (data) {
-                        case "OK":
-                            $("#msg").html("Data sent successfully");
-                            break;
-                        case "DUP":
-                            $("#msg").html("Username already exists");
-                            break;
-                        case "BAD":
-                            $("#msg").html("Database Error");
-                            break;
-                    }
-                });
-            });
-        });
+	<script type="text/javascript">
+		function autologout() {
+			$.post("/autologout.cgi", function(data, status) {});
+		}
+		$(document).ready(function() {
+			$.post("/username.cgi", function(data, status) {
+				$("#username").html(data);
+				$("#username1").html(data);
+			});
+			setInterval("autologout()", 20000);
+			$.get("/types.cgi", function(data, status) {
+				$("#type").html(data);
+			});
+			$("#enviar").click(function() {
+				$.post("/username.cgi", function(data, status) {
+					$("#username").html(data);
+					$("#username1").html(data);
+				});
+				$.post("/nuevoCliente.cgi", $("#testform").serialize(), function(data, status) {
+					$("#nom_cli").val("");
+					$("#passw").val("");
+					$("#status").val(1);
+					switch (data) {
+						case "OK":
+							$("#msg").html("Data sent successfully");
+							break;
+						case "DUP":
+							$("#msg").html("Username already exists");
+							break;
+						case "BAD":
+							$("#msg").html("Database Error");
+							break;
+					}
+				});
+			});
+		});
 
-    </script>
+	</script>
 
 </body>
 

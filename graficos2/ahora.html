@@ -2,102 +2,102 @@
 <html lang="en">
 
 <head>
-    <title>Streaming Control Panel</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<title>Streaming Control Panel</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 
 <body style="padding-top: 70px;">
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="sr-only">Change navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-                <a class="navbar-brand" href="#">HLServer 3.0</a>
-            </div>
-            <div class="collapse navbar-collapse" id="myNavbar">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown active">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li class="active"><a href="ahora.html">Now</a></li>
-                            <li><a href="dayly.html">Dayly</a></li>
-                            <li><a href="monthly.html">Monthly</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="edit.html">Panel Password</a></li>
-                            <li><a href="publish.html">Publish Password</a></li>
-                            <li><a href="locks.html">Stream Locking</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="hidden-xs">
-                        <p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> </p>
-                    </li>
-                    <li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+				<a class="navbar-brand" href="#">HLServer 3.0</a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul class="nav navbar-nav">
+					<li class="dropdown active">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Stats <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li class="active"><a href="ahora.html">Now</a></li>
+							<li><a href="dayly.html">Dayly</a></li>
+							<li><a href="monthly.html">Monthly</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="edit.html">Panel Password</a></li>
+							<li><a href="publish.html">Publish Password</a></li>
+							<li><a href="locks.html">Stream Locking</a></li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li class="hidden-xs">
+						<p class="navbar-text">&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-user" id="username"></span> </p>
+					</li>
+					<li><a href="/logout.cgi"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-    <div class="container">
-        <!-- encoders html code -->
-        <div id="encoders"></div>
-    </div>
+	<div class="container">
+		<!-- encoders html code -->
+		<div id="encoders"></div>
+	</div>
 
 
-    <div class="container">
-        <!-- players html code -->
-        <div id="players"></div>
-    </div>
+	<div class="container">
+		<!-- players html code -->
+		<div id="players"></div>
+	</div>
 
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $.post("/username.cgi", function(data, status) {
-                $("#username").html(data);
-            });
-            $.post("/encoderStatNow.cgi", function(data, status) {
-                $("#encoders").html(data);
-            });
-            $.post("/playerStatNow.cgi", function(data, status) {
-                $("#players").html(data);
-            });
-            setInterval("delayedPost()", 10000);
-        });
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$.post("/username.cgi", function(data, status) {
+				$("#username").html(data);
+			});
+			$.post("/encoderStatNow.cgi", function(data, status) {
+				$("#encoders").html(data);
+			});
+			$.post("/playerStatNow.cgi", function(data, status) {
+				$("#players").html(data);
+			});
+			setInterval("delayedPost()", 10000);
+		});
 
-        function delayedPost() {
-            $.post("/encoderStatNow.cgi", function(data, status) {
-                $("#encoders").html(data);
-            });
-            $.post("/playerStatNow.cgi", function(data, status) {
-                $("#players").html(data);
-            });
-        }
+		function delayedPost() {
+			$.post("/encoderStatNow.cgi", function(data, status) {
+				$("#encoders").html(data);
+			});
+			$.post("/playerStatNow.cgi", function(data, status) {
+				$("#players").html(data);
+			});
+		}
 
-        function launch(newURL, newName, newFeatures, orgName) {
-            var remote = open(newURL, newName, newFeatures);
-            if (remote.opener == null) remote.opener = window;
-            remote.opener.name = orgName;
-            return remote;
-        }
+		function launch(newURL, newName, newFeatures, orgName) {
+			var remote = open(newURL, newName, newFeatures);
+			if (remote.opener == null) remote.opener = window;
+			remote.opener.name = orgName;
+			return remote;
+		}
 
-        function launchRemote(url) {
-            myRemote = launch(url, "playtv", "height=429,width=620,channelmode=0,dependent=0,directories=0,fullscreen=0,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0", "myWindow");
-        }
+		function launchRemote(url) {
+			myRemote = launch(url, "playtv", "height=429,width=620,channelmode=0,dependent=0,directories=0,fullscreen=0,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0", "myWindow");
+		}
 
-    </script>
+	</script>
 
 </body>
 
