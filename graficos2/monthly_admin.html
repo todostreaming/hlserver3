@@ -50,28 +50,19 @@
 
     <!-- common -->
     <div class="container" align="center">
-        <h4 class="text-center text-primary">Stats corresponding to 2017/05 <span class="visible-xs"><small>(<div id="username1"></div>)</small></span></h4>
+        <h4 class="text-center text-primary">Stats corresponding to: <span class="visible-xs"><small>(<div id="username1"></div>)</small></span></h4>
         <div>
             <form class="form-inline">
                 <div class="form-group">
-                    <select class="form-control" id="month" name="month">
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
+                    <select class="form-control" id="months" name="months">
             </select>
                 </div>
                 <div class="form-group">
-                    <select class="form-control" id="year" name="year">
-                <option value="2016">2016</option>
-                <option value="2017">2017</option>
-                <option value="2018">2018</option>
+                    <select class="form-control" id="years" name="years">
             </select>
                 </div>
                 <div class="form-group">
-                    <select class="form-control" id="type" name="type">
-                <option value="1">admin</option>
-                <option value="2">distro</option>
-                <option value="3">publisher</option>
+                    <select class="form-control" id="types" name="types">
             </select>
                 </div>
             </form>
@@ -80,49 +71,51 @@
     </div>
 
     <div class="container">
-        <table class="table table-hover table-condensed">
-            <thead class="bg-primary">
-                <tr class="row">
-                    <th class="col-xs-5 col-sm-4">Username</th>
-                    <!-- 16 chars max -->
-                    <th class="hidden-xs col-sm-3">Password</th>
-                    <!-- 16 chars max -->
-                    <th class="hidden-xs col-sm-2">Hours</th>
-                    <th class="col-xs-5 col-sm-2">GBs</th>
-                    <th class="col-xs-2 col-sm-1">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="row">
-                    <td class="col-xs-5 col-sm-4">radiovida</th>
-                        <!-- 16 chars max -->
-                        <td class="hidden-xs col-sm-3">alabama2017</th>
-                            <!-- 16 chars max -->
-                            <td class="hidden-xs col-sm-2">9249</th>
-                                <td class="col-xs-5 col-sm-2">5874</th>
-                                    <td class="col-xs-2 col-sm-1"><input checked data-toggle="toggle" type="checkbox" data-size="mini" data-onstyle="success" data-offstyle="danger"></th>
-                </tr>
-                <tr class="row">
-                    <td class="col-xs-5 col-sm-4">luztv</th>
-                        <!-- 16 chars max -->
-                        <td class="hidden-xs col-sm-3">juanito66</th>
-                            <!-- 16 chars max -->
-                            <td class="hidden-xs col-sm-2">229249</th>
-                                <td class="col-xs-5 col-sm-2">125874</th>
-                                    <td class="col-xs-2 col-sm-1"><input data-toggle="toggle" type="checkbox" data-size="mini" data-onstyle="success" data-offstyle="danger"></th>
-                </tr>
-                <tr class="row">
-                    <td class="col-xs-5 col-sm-4">ondaluz</th>
-                        <!-- 16 chars max -->
-                        <td class="hidden-xs col-sm-3">rascapapa56</th>
-                            <!-- 16 chars max -->
-                            <td class="hidden-xs col-sm-2">0</th>
-                                <td class="col-xs-5 col-sm-2">12</th>
-                                    <td class="col-xs-2 col-sm-1"><input checked data-toggle="toggle" type="checkbox" data-size="mini" data-onstyle="success" data-offstyle="danger"></th>
-                </tr>
-            </tbody>
-        </table>
+        <div id="campos"></div>
     </div>
+
+    <script type="text/javascript">
+        function autologout() {
+            $.post("/autologout.cgi", function(data, status) {});
+        }
+        $(document).ready(function() {
+            $.post("/username.cgi", function(data, status) {
+                $("#username").html(data);
+                $("#username1").html(data);
+            });
+            setInterval("autologout()", 20000);
+            //SE GENERA EL FORMULARIO
+            $.post("/getMonthsYearsAdmin.cgi", function(data, status) {
+                var res = data.trim().split(";");
+                $("#months").html(res[0]);
+                $("#years").html(res[1]);
+                $("#types").html(res[2]);
+            });
+            //MUESTRA LOS DATOS EN LA PRIMERA RECARGA
+            $.post("/putMonthlyAdmin.cgi", $("#testform").serialize(), function(data, status) {
+                $("#campos").html(data);
+            });
+            //MUESTRA LOS DATOS DE LOS SELECTS
+            $("#months, #years, #types").change(function() {
+                $.post("/putMonthlyAdminChange.cgi", $("#testform").serialize(), function(data, status) {
+                    if (data == "NoBD") {
+                        $("#campos").html("");
+                    } else {
+                        $("#campos").html(data);
+                    }
+                });
+            });
+        });
+        //Función que modifica por id el estado de un cliente
+        function load(id) {
+            if (confirm("Sure you wanna change this status ?")) {
+                $.post("/changeStatus.cgi", "load=" + id, function(data, status) {
+                    location.reload();
+                });
+            }
+        }
+
+    </script>
 
 </body>
 

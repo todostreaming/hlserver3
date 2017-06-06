@@ -89,7 +89,7 @@ func putMonthlyAdmin(w http.ResponseWriter, r *http.Request) {
 	// ---- end of session identification -------------------------------
 
 	anio, mes, _ := time.Now().Date() //Fecha actual
-	table := "<tr><th>Username</th><th>Password</th><th>Hours</th><th>GBs</th><th>Status</th></tr>"
+	table := "<table class=\"table table-hover table-condensed\"><thead class=\"bg-primary\"><tr class=\"row\"><th class=\"col-xs-5 col-sm-4\">Username</th><th class=\"hidden-xs col-sm-3\">Password</th><th class=\"hidden-xs col-sm-2\">Hours</th><th class=\"col-xs-5 col-sm-2\">GBs</th><th class=\"col-xs-2 col-sm-1\">Status</th></tr></thead><tbody>"
 	mesGrafico := fmt.Sprintf("%d-%02d", anio, mes)
 
 	dbgeneral, err := sql.Open("sqlite3", DirDB+"general.db")
@@ -107,19 +107,21 @@ func putMonthlyAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for query.Next() {
-		var user, pass, estado string
+		var user, pass, estado, btn string
 		var id, status, horas, gigas int
 		query.Scan(&id, &user, &pass, &status)
 		if status == 1 {
 			estado = "ON"
+			btn = "btn-success"
 		} else {
 			estado = "OFF"
+			btn = "btn-danger"
 		}
 		horas, gigas = sumaconsumo(id, tipo+1, mesGrafico)
-		table += fmt.Sprintf("<tr><td>%s</td><td>%s</td><td>%d</td><td>%d</td><td><button href='#' title='Press to change the status' onclick='load(%d)'>%s</button></td></tr>", user, pass, horas, gigas, id, estado)
+		table = table + fmt.Sprintf("<tr class=\"row\"><td class=\"col-xs-5 col-sm-4\">%s</td><td class=\"hidden-xs col-sm-3\">%s</td><td class=\"hidden-xs col-sm-2\">%d</td><td class=\"col-xs-5 col-sm-2\">%d</td><td class=\"col-xs-2 col-sm-1\"><button class=\"btn %s btn-xs\" href='#' title='Press to change the status' onclick='load(%d)'>%s</button></td></td></tr>", user[0:15], pass[0:15], horas, gigas, btn, id, estado)
 	}
 	query.Close()
-	fmt.Fprintf(w, "%s", table)
+	fmt.Fprintf(w, "%s", table+"</tbody></table></div>")
 }
 
 // Funcion que muestra los datos mensuales de los clientes
@@ -156,7 +158,7 @@ func putMonthlyAdminChange(w http.ResponseWriter, r *http.Request) {
 	mesGrafico := r.FormValue("years") + "-" + r.FormValue("months")
 	tipo := toInt(r.FormValue("types"))
 
-	table := "<tr><th>Username</th><th>Password</th><th>Hours</th><th>GBs</th><th>Status</th></tr>"
+	table := "<table class=\"table table-hover table-condensed\"><thead class=\"bg-primary\"><tr class=\"row\"><th class=\"col-xs-5 col-sm-4\">Username</th><th class=\"hidden-xs col-sm-3\">Password</th><th class=\"hidden-xs col-sm-2\">Hours</th><th class=\"col-xs-5 col-sm-2\">GBs</th><th class=\"col-xs-2 col-sm-1\">Status</th></tr></thead><tbody>"
 
 	if _, err := os.Stat(dirMonthlys + mesGrafico + "monthly.db"); os.IsNotExist(err) {
 		//No hay base de datos
@@ -180,19 +182,21 @@ func putMonthlyAdminChange(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for query.Next() {
-		var user, pass, estado string
+		var user, pass, estado, btn string
 		var id, status, horas, gigas int
 		query.Scan(&id, &user, &pass, &status)
 		if status == 1 {
 			estado = "ON"
+			btn = "btn-success"
 		} else {
 			estado = "OFF"
+			btn = "btn-danger"
 		}
 		horas, gigas = sumaconsumo(id, tipo, mesGrafico)
-		table += fmt.Sprintf("<tr><td>%s</td><td>%s</td><td>%d</td><td>%d</td><td><button href='#' title='Press to change the status' onclick='load(%d)'>%s</button></td></tr>", user, pass, horas, gigas, id, estado)
+		table = table + fmt.Sprintf("<tr class=\"row\"><td class=\"col-xs-5 col-sm-4\">%s</td><td class=\"hidden-xs col-sm-3\">%s</td><td class=\"hidden-xs col-sm-2\">%d</td><td class=\"col-xs-5 col-sm-2\">%d</td><td class=\"col-xs-2 col-sm-1\"><button class=\"btn %s btn-xs\" href='#' title='Press to change the status' onclick='load(%d)'>%s</button></td></td></tr>", user[0:15], pass[0:15], horas, gigas, btn, id, estado)
 	}
 	query.Close()
-	fmt.Fprintf(w, "%s", table)
+	fmt.Fprintf(w, "%s", table+"</tbody></table></div>")
 
 }
 

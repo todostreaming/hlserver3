@@ -59,28 +59,53 @@
                         </div>
                         <div class="panel-body">
                             <form>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                    <input id="email" type="text" class="form-control" name="email" value="admin" readonly>
-                                </div>
+                                <div class="input-group" id="user"></div>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
                                     <input id="password" type="password" class="form-control" name="password" placeholder="Password" required autofocus>
                                 </div>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                                    <input id="repassword" type="password" class="form-control" name="repeat-password" placeholder="Repeat password" required>
+                                    <input id="repeat-password" type="password" class="form-control" name="repeat-password" placeholder="Repeat password" required>
                                 </div>
-                                <div class="text-success" id="stat"><strong>correctly changed</strong></div>
-                                <button type="submit" class="btn btn-primary">Change</button>
+                                <div class="input-group" id="stat">
+                                    <button type="submit" class="btn btn-primary" id="enviar">Change</button>
                             </form>
+                            </div>
                         </div>
                     </div>
+                    <div class="col-xs-1 col-sm-4">&nbsp;</div>
                 </div>
-                <div class="col-xs-1 col-sm-4">&nbsp;</div>
             </div>
         </div>
-    </div>
+
+        <script type="text/javascript">
+            function autologout() {
+                $.post("/autologout.cgi", function(data, status) {});
+            }
+            $(document).ready(function() {
+                $.post("/username.cgi", function(data, status) {
+                    $("#username").html(data);
+                    $("#username1").html(data);
+                });
+                user();
+                setInterval("autologout()", 20000);
+                $("#enviar").click(function() {
+                    $.post("/editar_admin.cgi", $("#testform").serialize(), function(data, status) {
+                        $("#stat").html(data);
+                        $("#password").val("");
+                        $("#repeat-password").val("");
+                    });
+                });
+            });
+            //Función que refresca los datos de la tabla
+            function user() {
+                $.post("/user_admin.cgi", function(data, status) {
+                    $("#user").html(data);
+                });
+            }
+
+        </script>
 
 </body>
 

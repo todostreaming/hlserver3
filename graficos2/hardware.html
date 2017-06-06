@@ -62,45 +62,31 @@
                                 <tbody>
                                     <tr class="row">
                                         <td class="col-xs-5 col-sm-2 text-success"><strong>CPU:</strong></td>
-                                        <!-- 16 chars max -->
-                                        <td class="col-xs-7 col-sm-10" align="right">Intel(R) Xeon(R) CPU E3-1230 v5 @ 3.40GHz (8 cores)</td>
-                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right"><span id="cpu"></span></td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-5 col-sm-2 text-success"><strong>RAM:</strong></td>
-                                        <!-- 16 chars max -->
-                                        <td class="col-xs-7 col-sm-10" align="right">32693 MB</td>
-                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right"><span id="ram"></span>/td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-5 col-sm-2 text-success"><strong>CPU used:</strong></td>
-                                        <!-- 16 chars max -->
-                                        <td class="col-xs-7 col-sm-10" align="right">0%</td>
-                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right"><span id="cpused"></span></td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-5 col-sm-2 text-success"><strong>RAM used:</strong></td>
-                                        <!-- 16 chars max -->
-                                        <td class="col-xs-7 col-sm-10" align="right">10%</td>
-                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right"><span id="ramused"></span></td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-5 col-sm-2 text-success"><strong>Upload:</strong></td>
-                                        <!-- 16 chars max -->
-                                        <td class="col-xs-7 col-sm-10" align="right">8971 kbps</td>
-                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right"><span id="upload"></span></td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-5 col-sm-2 text-success"><strong>Download:</strong></td>
-                                        <!-- 16 chars max -->
-                                        <td class="col-xs-7 col-sm-10" align="right">32693 kbps</td>
-                                        <!-- 16 chars max -->
+                                        <td class="col-xs-7 col-sm-10" align="right"><span id="download"></span></td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-5 col-sm-2 text-success">&nbsp;</td>
-                                        <!-- 16 chars max -->
                                         <td class="col-xs-7 col-sm-10" align="right">&nbsp;</td>
-                                        <!-- 16 chars max -->
                                     </tr>
                                 </tbody>
                             </table>
@@ -111,6 +97,34 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $.post("/username.cgi", function(data, status) {
+                $("#username").html(data);
+                $("#username1").html(data);
+            });
+            delayedPost();
+            setInterval("delayedPost()", 10000);
+        });
+
+        function delayedPost() {
+            $.post("/username.cgi", function(data, status) {
+                $("#username").html(data);
+                $("#username1").html(data);
+            });
+            $.post("/hardware.cgi", function(data, status) {
+                var res = data.split(";");
+                $("#cpu").html(res[0]);
+                $("#ram").html(res[1]);
+                $("#cpused").html(res[2]);
+                $("#ramused").html(res[3]);
+                $("#upload").html(res[4]);
+                $("#download").html(res[5]);
+            });
+        }
+
+    </script>
 
 </body>
 

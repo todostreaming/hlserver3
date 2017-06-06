@@ -52,9 +52,9 @@ func editar_admin(w http.ResponseWriter, r *http.Request) {
 			Error.Println(err)
 			return
 		}
-		fmt.Fprintf(w, "<div class='form-group text-success'>%s</div>", good)
+		fmt.Fprintf(w, "<div class=\"text-success\" id=\"stat\"><strong>%s</strong></div>", good)
 	} else {
 		bad := "Passwords do not coincide"
-		fmt.Fprintf(w, "<div class='form-group text-danger'>%s</div>", bad)
+		fmt.Fprintf(w, "<div class=\"text-danger\" id=\"stat\"><strong>%s</strong></div>", bad)
 	}
 }
