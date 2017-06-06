@@ -58,17 +58,15 @@
                             select the customer to delete
                         </div>
                         <div class="panel-body">
-                            <form>
+                            <form id="testform" action="" method="post">
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                    <select class="form-control" name="username" id="user">
-                                <option value="pedro">pedro</option>
-                                <option value="pepe">pepe</option>
-                                <option value="juan">juan</option>
+                                    <select class="form-control" name="clients" id="clients">
                             </select>
                                 </div><br/>
-                                <div align="center"><button type="submit" class="btn btn-primary">Delete</button></div>
+                                <div align="center"><button type="submit" class="btn btn-primary" name="borrar" id="borrar">Delete</button></div>
                             </form>
+                            <div class="text-center" id="msg"></div>
                         </div>
                     </div>
                 </div>
@@ -76,6 +74,43 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        function autologout() {
+            $.post("/autologout.cgi", function(data, status) {});
+        }
+        $(document).ready(function() {
+            $.post("/username.cgi", function(data, status) {
+                $("#username").html(data);
+                $("#username1").html(data);
+            });
+            setInterval("autologout()", 20000);
+            $.post("/buscarClientes.cgi", function(data, status) {
+                $("#clients").html(data);
+            });
+            $("#borrar").click(function() {
+                $.post("/borrarCliente.cgi", $("#testform").serialize(), function(data, status) {
+                    // write a message displaying what happened
+                    switch (data) {
+                        case "OK":
+                            $("#msg").html("User successfully deleted. Please wait...");
+                            break;
+                        case "DUP":
+                            $("#msg").html("User has clients on it (not deleted). Please wait...");
+                            break;
+                        case "BAD":
+                            $("#msg").html("Database Error. Please wait...");
+                            break;
+                    }
+                    setTimeout(clearall, 2000); // wait 2 seconds before cleaning the message
+                    function clearall() {
+                        location.reload();
+                    }
+                });
+            });
+        });
+
+    </script>
 
 </body>
 

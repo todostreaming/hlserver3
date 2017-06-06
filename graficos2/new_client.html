@@ -60,29 +60,29 @@
                             enter your customer's data
                         </div>
                         <div class="panel-body">
-                            <form>
+                            <form id="testform" action="" method="post">
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                    <input id="email" type="text" class="form-control" name="email" placeholder="Username" required autofocus>
+                                    <input id="nom_cli" type="text" class="form-control" name="nom_cli" placeholder="Username" required autofocus>
                                 </div><br/>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                                    <input id="password" type="password" class="form-control" name="password" placeholder="Password" required>
+                                    <input id="passw" type="password" class="form-control" name="passw" placeholder="Password" required>
                                 </div><br/>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-tags"></i></span>
                                     <select class="form-control" name="type" id="type">
-                                <option value="1">Admin</option>
-                                <option value="2">Distributor</option>
-                                <option value="3">Publisher</option>
                             </select>
                                 </div><br/>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-off"></i></span>
-                                    <input checked data-toggle="toggle" type="checkbox" data-size="small" data-onstyle="success" data-offstyle="danger">
+                                    <select class="form-control" name="status" id="status">
+                                         <option value="0">disabled</option>
+                                        <option value="1" selected>enabled</option>
+                           </select>
                                 </div>
                                 <div class="text-success" id="stat" align="center"><strong>correctly changed</strong><br/>
-                                    <button type="submit" class="btn btn-primary">Register</button></div>
+                                    <button type="submit" class="btn btn-primary" name="enviar" id="enviar">Register</button></div>
                             </form>
                         </div>
                     </div>
@@ -91,6 +91,45 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        function autologout() {
+            $.post("/autologout.cgi", function(data, status) {});
+        }
+        $(document).ready(function() {
+            $.post("/username.cgi", function(data, status) {
+                $("#username").html(data);
+                $("#username1").html(data);
+            });
+            setInterval("autologout()", 20000);
+            $.get("/types.cgi", function(data, status) {
+                $("#type").html(data);
+            });
+            $("#enviar").click(function() {
+                $.post("/username.cgi", function(data, status) {
+                    $("#username").html(data);
+                    $("#username1").html(data);
+                });
+                $.post("/nuevoCliente.cgi", $("#testform").serialize(), function(data, status) {
+                    $("#nom_cli").val("");
+                    $("#passw").val("");
+                    $("#status").val(1);
+                    switch (data) {
+                        case "OK":
+                            $("#msg").html("Data sent successfully");
+                            break;
+                        case "DUP":
+                            $("#msg").html("Username already exists");
+                            break;
+                        case "BAD":
+                            $("#msg").html("Database Error");
+                            break;
+                    }
+                });
+            });
+        });
+
+    </script>
 
 </body>
 
