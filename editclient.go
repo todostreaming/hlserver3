@@ -135,3 +135,22 @@ func user_admin(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "<span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-user\"></i></span><input class='form-control' placeholder='Usuario' readonly='readonly' name='username' type='username' value='%s' autofocus>", user)
 }
+
+//Funcion para editar los datos del admin
+func username(w http.ResponseWriter, r *http.Request) {
+	// --- we must identify the session user 1st ------------------------
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		return
+	}
+	key := cookie.Value
+	mu_user.RLock()
+	user, ok := user_[key]
+	mu_user.RUnlock()
+	if !ok {
+		return
+	}
+	// ---- end of session identification -------------------------------
+
+	fmt.Fprintf(w, user)
+}

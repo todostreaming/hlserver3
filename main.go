@@ -145,6 +145,7 @@ func main() {
 	http.HandleFunc("/add_referrer.cgi", add_referrer)
 	http.HandleFunc("/delreferer.cgi", delreferer)
 	http.HandleFunc("/autologout.cgi", autologout)
+	http.HandleFunc("/username.cgi", username)
 	http.HandleFunc("/embed/", embed)
 
 	log.Fatal(s.ListenAndServe()) // Servidor HTTP multihilo
